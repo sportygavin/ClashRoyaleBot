@@ -87,12 +87,43 @@ class ClashRoyaleVision(ComputerVisionSystem):
     
     def _detect_elixir_bar(self, gray_screen: np.ndarray) -> bool:
         """Detect if elixir bar is visible (indicates in-game)"""
-        # Look for elixir bar in top center of screen
-        elixir_region = gray_screen[30:80, 800:1120]  # Approximate elixir bar area
+        height, width = gray_screen.shape
         
-        # Simple detection based on color patterns
-        # In a real implementation, you'd use template matching
-        return np.mean(elixir_region) > 100  # Placeholder logic
+        # Scale regions based on actual screen size
+        # For 3024x1964 resolution
+        elixir_region = gray_screen[
+            int(height * 0.04):int(height * 0.08),  # 78:157
+            int(width * 0.26):int(width * 0.37)     # 786:1119
+        ]
+        
+        # More flexible detection - look for UI elements that indicate in-game
+        elixir_brightness = np.mean(elixir_region)
+        
+        # Also check for other in-game indicators
+        # Look for the arena (middle area should be darker in game)
+        arena_region = gray_screen[
+            int(height * 0.20):int(height * 0.61),  # 393:1198
+            int(width * 0.13):int(width * 0.40)     # 393:1209
+        ]
+        arena_brightness = np.mean(arena_region)
+        
+        # Look for card slots at bottom
+        card_region = gray_screen[
+            int(height * 0.92):int(height * 1.0),   # 1807:1964
+            int(width * 0.07):int(width * 0.46)     # 212:1391
+        ]
+        card_brightness = np.mean(card_region)
+        
+        # In-game if we have reasonable brightness in UI areas
+        # and darker arena (indicating game field)
+        # Adjusted thresholds based on actual screen analysis
+        in_game_indicators = (
+            elixir_brightness > 60 and  # Elixir bar visible (lowered from 85)
+            arena_brightness < 120 and  # Arena is darker (raised from 75)
+            card_brightness > 30        # Card area visible (lowered from 40)
+        )
+        
+        return in_game_indicators
     
     def _detect_matchmaking(self, gray_screen: np.ndarray) -> bool:
         """Detect matchmaking screen"""

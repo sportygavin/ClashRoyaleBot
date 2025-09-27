@@ -23,8 +23,8 @@ GAME_CONFIG = {
     # For Android emulator (BlueStacks/MuMuPlayer/Nox)
     "android_emulator": {
         "window_title": "BlueStacks",  # Change to "MuMuPlayer" or "Nox" if using those
-        "screen_resolution": (1920, 1080),
-        "game_area": {"x": 0, "y": 0, "width": 1920, "height": 1080},
+        "screen_resolution": (3024, 1964),  # Updated for your MacBook Retina display
+        "game_area": {"x": 0, "y": 0, "width": 3024, "height": 1964},
         "emulator_type": "bluestacks",  # Options: "bluestacks", "mumuplayer", "nox"
         "adb_port": 5555  # ADB port for automation
     },
@@ -50,15 +50,15 @@ GAME_CONFIG = {
         "game_area": {"x": 0, "y": 0, "width": 1179, "height": 2556}
     },
     
-    # Universal card positions (will be adjusted per platform)
+    # Universal card positions (adjusted for 3024x1964 resolution)
     "card_slots": {
         "count": 4,
         "positions": [
-            (400, 900), (600, 900), (800, 900), (1000, 900)
+            (630, 1470), (945, 1470), (1260, 1470), (1575, 1470)  # Scaled for 3024x1964
         ]
     },
     "elixir_bar": {
-        "position": (960, 50),
+        "position": (1512, 78),  # Scaled for 3024x1964
         "max_elixir": 10
     }
 }
