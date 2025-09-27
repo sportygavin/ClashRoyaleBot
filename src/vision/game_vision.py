@@ -150,9 +150,9 @@ class ClashRoyaleVision(ComputerVisionSystem):
         # and darker arena (indicating game field)
         # Adjusted thresholds based on actual screen analysis
         in_game_indicators = (
-            elixir_brightness > 60 and  # Elixir bar visible
+            elixir_brightness > 30 and  # Elixir bar visible (lowered from 60)
             arena_brightness < 120 and  # Arena is darker
-            card_brightness > 30        # Card area visible
+            card_brightness > 20        # Card area visible (lowered from 30)
         )
         
         return in_game_indicators
