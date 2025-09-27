@@ -45,18 +45,50 @@ class ClashRoyaleVision(ComputerVisionSystem):
         pass
     
     def capture_screen(self) -> np.ndarray:
-        """Capture the game screen"""
+        """Capture the game screen with proper aspect ratio"""
         try:
-            # Capture specific game area
+            # First, capture the full screen to detect actual dimensions
+            full_screenshot = pyautogui.screenshot()
+            full_height, full_width = full_screenshot.size
+            
+            # Calculate proper game area that maintains aspect ratio
+            # BlueStacks typically uses 16:9 aspect ratio
+            target_aspect_ratio = 16 / 9
+            
+            # Calculate the maximum width we can use while maintaining aspect ratio
+            max_width = int(full_height * target_aspect_ratio)
+            
+            # If the calculated width is larger than screen width, use screen width
+            if max_width > full_width:
+                max_width = full_width
+                # Recalculate height to maintain aspect ratio
+                target_height = int(full_width / target_aspect_ratio)
+            else:
+                target_height = full_height
+            
+            # Center the game area on the screen
+            x_offset = (full_width - max_width) // 2
+            y_offset = (full_height - target_height) // 2
+            
+            # Capture the centered game area
             screenshot = pyautogui.screenshot(region=(
-                self.game_area["x"],
-                self.game_area["y"], 
-                self.game_area["width"],
-                self.game_area["height"]
+                x_offset,
+                y_offset,
+                max_width,
+                target_height
             ))
             
             # Convert to OpenCV format
             screen = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
+            
+            # Update game area for other methods
+            self.game_area = {
+                "x": x_offset,
+                "y": y_offset,
+                "width": max_width,
+                "height": target_height
+            }
+            
             return screen
             
         except Exception as e:
@@ -89,11 +121,11 @@ class ClashRoyaleVision(ComputerVisionSystem):
         """Detect if elixir bar is visible (indicates in-game)"""
         height, width = gray_screen.shape
         
-        # Scale regions based on actual screen size
-        # For 3024x1964 resolution
+        # Scale regions based on actual captured screen size
+        # These are relative percentages that work for any screen size
         elixir_region = gray_screen[
-            int(height * 0.04):int(height * 0.08),  # 78:157
-            int(width * 0.26):int(width * 0.37)     # 786:1119
+            int(height * 0.04):int(height * 0.08),  # Top 4-8% of screen
+            int(width * 0.25):int(width * 0.75)     # Middle 50% of screen width
         ]
         
         # More flexible detection - look for UI elements that indicate in-game
@@ -102,15 +134,15 @@ class ClashRoyaleVision(ComputerVisionSystem):
         # Also check for other in-game indicators
         # Look for the arena (middle area should be darker in game)
         arena_region = gray_screen[
-            int(height * 0.20):int(height * 0.61),  # 393:1198
-            int(width * 0.13):int(width * 0.40)     # 393:1209
+            int(height * 0.20):int(height * 0.80),  # Middle 60% of screen height
+            int(width * 0.10):int(width * 0.90)     # Middle 80% of screen width
         ]
         arena_brightness = np.mean(arena_region)
         
         # Look for card slots at bottom
         card_region = gray_screen[
-            int(height * 0.92):int(height * 1.0),   # 1807:1964
-            int(width * 0.07):int(width * 0.46)     # 212:1391
+            int(height * 0.85):int(height * 1.0),   # Bottom 15% of screen
+            int(width * 0.10):int(width * 0.90)     # Middle 80% of screen width
         ]
         card_brightness = np.mean(card_region)
         
@@ -118,9 +150,9 @@ class ClashRoyaleVision(ComputerVisionSystem):
         # and darker arena (indicating game field)
         # Adjusted thresholds based on actual screen analysis
         in_game_indicators = (
-            elixir_brightness > 60 and  # Elixir bar visible (lowered from 85)
-            arena_brightness < 120 and  # Arena is darker (raised from 75)
-            card_brightness > 30        # Card area visible (lowered from 40)
+            elixir_brightness > 60 and  # Elixir bar visible
+            arena_brightness < 120 and  # Arena is darker
+            card_brightness > 30        # Card area visible
         )
         
         return in_game_indicators
@@ -176,8 +208,18 @@ class ClashRoyaleVision(ComputerVisionSystem):
     def _extract_player_cards(self, screen: np.ndarray) -> List[Card]:
         """Extract player's available cards"""
         cards = []
+        height, width = screen.shape[:2]
         
-        for i, pos in enumerate(self.card_positions):
+        # Calculate card positions relative to the actual screen size
+        # 4 cards evenly distributed across the bottom 15% of the screen
+        card_y = int(height * 0.92)  # 92% down from top
+        card_spacing = width // 5  # Divide width into 5 sections (4 cards + margins)
+        
+        for i in range(4):
+            # Calculate x position for each card
+            card_x = card_spacing + (i * card_spacing)
+            pos = (card_x, card_y)
+            
             # Extract card region
             card_region = screen[pos[1]-50:pos[1]+50, pos[0]-50:pos[0]+50]
             

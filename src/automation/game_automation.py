@@ -32,18 +32,30 @@ class ClashRoyaleAutomation(ActionExecutor):
     def place_card(self, card_index: int, position: Tuple[int, int]) -> bool:
         """Place a card at specified position"""
         try:
-            if card_index < 0 or card_index >= len(self.card_positions):
+            if card_index < 0 or card_index >= 4:  # We always have 4 cards
                 return False
             
-            # Get card position
-            card_pos = self.card_positions[card_index]
+            # Calculate card position dynamically based on current screen
+            # This matches the calculation in the vision system
+            screen_width = self.game_area["width"]
+            screen_height = self.game_area["height"]
+            
+            card_y = int(screen_height * 0.92)  # 92% down from top
+            card_spacing = screen_width // 5  # Divide width into 5 sections
+            card_x = card_spacing + (card_index * card_spacing)
+            card_pos = (card_x, card_y)
+            
+            # Adjust target position to be relative to the captured screen area
+            # Add the offset to account for the cropped screen
+            target_x = position[0] + self.game_area["x"]
+            target_y = position[1] + self.game_area["y"]
             
             # Click and drag from card to target position
             pyautogui.moveTo(card_pos[0], card_pos[1])
             pyautogui.mouseDown()
             time.sleep(0.1)  # Small delay for drag start
             
-            pyautogui.moveTo(position[0], position[1])
+            pyautogui.moveTo(target_x, target_y)
             time.sleep(0.1)  # Small delay for drag end
             
             pyautogui.mouseUp()
