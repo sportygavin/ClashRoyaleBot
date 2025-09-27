@@ -1,8 +1,8 @@
-# Clash Royale Bot 🤖⚔️
+# Clash Royale Bot 
 
 A fully automated Clash Royale bot that learns game mechanics and strategies to compete against real players. The bot uses computer vision, machine learning, and strategic decision-making to play matches and improve over time.
 
-## 🎯 Features
+## Features
 
 - **Computer Vision**: Real-time game state detection using OpenCV
 - **Strategic AI**: Rule-based and ML-powered decision making
@@ -11,7 +11,7 @@ A fully automated Clash Royale bot that learns game mechanics and strategies to 
 - **Human-like Behavior**: Natural delays and movement patterns
 - **Learning System**: Improves performance through experience
 
-## 🏗️ Architecture
+## Architecture
 
 The bot consists of five main components:
 
@@ -21,7 +21,7 @@ The bot consists of five main components:
 4. **Learning System** (`src/learning/`) - ML model training and optimization
 5. **Match Recorder** (`src/recording/`) - Captures and analyzes match data
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 
@@ -74,7 +74,7 @@ ClashRoyaleBot/
 └── tests/               # Test files
 ```
 
-## 🎮 How It Works
+## How It Works
 
 ### Game State Detection
 - Captures screen using PyAutoGUI
@@ -99,7 +99,7 @@ ClashRoyaleBot/
 - Learns from victories and defeats
 - Continuously improves strategy over time
 
-## ⚙️ Configuration
+## Configuration
 
 Edit `config.py` to customize:
 
@@ -108,7 +108,7 @@ Edit `config.py` to customize:
 - **ML Parameters**: Learning rate, batch size, etc.
 - **Bot Behavior**: Reaction times, learning settings
 
-## 📊 Monitoring and Analysis
+## Monitoring and Analysis
 
 The bot automatically records:
 - All actions taken during matches
@@ -118,14 +118,14 @@ The bot automatically records:
 
 View statistics in the console or analyze saved match data in `data/matches/`.
 
-## 🛡️ Safety and Ethics
+## Safety and Ethics
 
 - **Bot Detection**: Uses human-like delays and patterns
 - **Terms of Service**: Review Clash Royale's ToS before use
 - **Account Safety**: Use on test accounts, not main accounts
 - **Fair Play**: Designed for learning and research purposes
 
-## 🔧 Advanced Usage
+## Advanced Usage
 
 ### Custom Strategies
 Implement custom strategy engines by extending the `StrategyEngine` class:
@@ -153,7 +153,7 @@ learning_system.train_on_match(match_data)
 - Modify ML parameters in `ML_CONFIG`
 - Fine-tune vision detection thresholds
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 **Bot not detecting game:**
 - Check emulator window title matches config
@@ -170,7 +170,7 @@ learning_system.train_on_match(match_data)
 - Add more randomization to actions
 - Use different emulator settings
 
-## 📈 Future Enhancements
+## Future Enhancements
 
 - [ ] Advanced card recognition using deep learning
 - [ ] Opponent strategy analysis and counter-play
@@ -178,21 +178,3 @@ learning_system.train_on_match(match_data)
 - [ ] Real-time strategy adaptation
 - [ ] Multi-account management
 - [ ] Tournament mode support
-
-## 🤝 Contributing
-
-Contributions are welcome! Please:
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is for educational and research purposes. Please respect Clash Royale's Terms of Service and use responsibly.
-
-## ⚠️ Disclaimer
-
-This bot is created for educational purposes. Using automated tools in Clash Royale may violate the game's Terms of Service and could result in account penalties. Use at your own risk and responsibility.
