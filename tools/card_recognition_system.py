@@ -55,6 +55,56 @@ class CardRecognitionSystem:
         
         return templates
     
+    def _auto_crop_content(self, image: np.ndarray, edge_thresh: float = 10.0, margin: int = 2) -> np.ndarray:
+        """Automatically crop away uniform padding (top/bottom/left/right) using edge energy.
+        Keeps a small margin to avoid over-cropping rounded borders.
+        """
+        if image is None or image.size == 0:
+            return image
+
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # Use Sobel to capture edges; more robust than Canny for low-contrast
+        grad_x = cv2.Sobel(gray, cv2.CV_32F, 1, 0, ksize=3)
+        grad_y = cv2.Sobel(gray, cv2.CV_32F, 0, 1, ksize=3)
+        mag = cv2.magnitude(grad_x, grad_y)
+
+        # Sum energy along axes
+        row_energy = mag.sum(axis=1)
+        col_energy = mag.sum(axis=0)
+
+        # Find bounds where energy exceeds a small threshold of the max
+        def find_bounds(energy: np.ndarray) -> Tuple[int, int]:
+            if energy.size == 0:
+                return 0, 0
+            max_e = float(energy.max())
+            if max_e <= 1e-6:
+                return 0, energy.size
+            thresh = max_e * 0.02  # 2% of max energy
+            indices = np.where(energy > max(thresh, edge_thresh))[0]
+            if indices.size == 0:
+                return 0, energy.size
+            start = max(int(indices[0]) - margin, 0)
+            end = min(int(indices[-1]) + 1 + margin, energy.size)
+            return start, end
+
+        r0, r1 = find_bounds(row_energy)
+        c0, c1 = find_bounds(col_energy)
+
+        cropped = image[r0:r1, c0:c1]
+        return cropped if cropped.size > 0 else image
+
+    def _preprocess_for_match(self, image: np.ndarray) -> np.ndarray:
+        """Normalize contrast and suppress color to make template matching more robust."""
+        if image is None or image.size == 0:
+            return image
+        gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+        # CLAHE for local contrast normalization
+        clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+        norm = clahe.apply(gray)
+        # Light blur to reduce noise
+        norm = cv2.GaussianBlur(norm, (3, 3), 0)
+        return norm
+
     def extract_cards_from_screen(self, screenshot=None):
         """Extract cards from screen using calibration data."""
         if screenshot is None:
@@ -124,23 +174,42 @@ class CardRecognitionSystem:
         
         return elixir_region if elixir_region.size > 0 else None
     
-    def recognize_card_by_template(self, card_img, threshold=0.8):
+    def recognize_card_by_template(self, card_img, threshold=0.3):
         """Recognize card using template matching."""
         best_match = None
-        best_score = 0
-        
+        best_score = 0.0
+
+        # Focus the card on its central artwork and normalize
+        card_cropped = self._auto_crop_content(card_img)
+        card_proc = self._preprocess_for_match(card_cropped)
+
+        # Try multiple template scales to be robust to slight size variance
+        scales = [0.9, 0.95, 1.0, 1.05, 1.1]
+
         for card_name, template in self.card_templates.items():
-            # Resize template to match card size
-            template_resized = cv2.resize(template, (card_img.shape[1], card_img.shape[0]))
-            
-            # Template matching
-            result = cv2.matchTemplate(card_img, template_resized, cv2.TM_CCOEFF_NORMED)
-            _, max_val, _, _ = cv2.minMaxLoc(result)
-            
-            if max_val > best_score and max_val > threshold:
-                best_score = max_val
-                best_match = card_name
-        
+            # Auto-trim padding from the template as well
+            tmpl_cropped = self._auto_crop_content(template)
+            tmpl_proc_base = self._preprocess_for_match(tmpl_cropped)
+
+            for s in scales:
+                h = int(tmpl_proc_base.shape[0] * s)
+                w = int(tmpl_proc_base.shape[1] * s)
+                if h < 8 or w < 8:
+                    continue
+                tmpl_proc = cv2.resize(tmpl_proc_base, (w, h), interpolation=cv2.INTER_LINEAR)
+
+                # Template must be <= card image for cv2.matchTemplate
+                if tmpl_proc.shape[0] > card_proc.shape[0] or tmpl_proc.shape[1] > card_proc.shape[1]:
+                    continue
+
+                result = cv2.matchTemplate(card_proc, tmpl_proc, cv2.TM_CCOEFF_NORMED)
+                _, max_val, _, _ = cv2.minMaxLoc(result)
+
+                if max_val > best_score:
+                    best_score = max_val
+                    best_match = card_name
+
+        # Always return the best match, even if below threshold
         return best_match, best_score
     
     def recognize_card_by_features(self, card_img):
@@ -200,11 +269,15 @@ class CardRecognitionSystem:
                 "elixir_region": elixir_region
             }
             
-            print(f"Card {card_number}: {card_name or 'Unknown'} (confidence: {confidence:.2f})")
-            if card_info:
-                print(f"  Elixir Cost: {card_info['elixir_cost']}")
-                print(f"  Rarity: {card_info['rarity']}")
-                print(f"  Type: {card_info['type']}")
+            if card_name:
+                confidence_indicator = "✓" if confidence >= 0.6 else "?" if confidence >= 0.3 else "⚠"
+                print(f"Card {card_number}: {card_name} {confidence_indicator} (confidence: {confidence:.2f})")
+                if card_info:
+                    print(f"  Elixir Cost: {card_info['elixir_cost']}")
+                    print(f"  Rarity: {card_info['rarity']}")
+                    print(f"  Type: {card_info['type']}")
+            else:
+                print(f"Card {card_number}: Unknown (confidence: {confidence:.2f})")
         
         return hand_analysis
     
@@ -266,9 +339,10 @@ class CardRecognitionSystem:
                             card_name = card_data['card_name']
                             confidence = card_data['confidence']
                             if card_name:
-                                print(f"  {card_id}: {card_name} ({confidence:.2f})")
+                                confidence_indicator = "✓" if confidence >= 0.6 else "?" if confidence >= 0.3 else "⚠"
+                                print(f"  {card_id}: {card_name} {confidence_indicator} ({confidence:.2f})")
                             else:
-                                print(f"  {card_id}: Unknown")
+                                print(f"  {card_id}: Unknown ({confidence:.2f})")
                         last_hand = current_hand
                 
                 time.sleep(1)  # Check every second
