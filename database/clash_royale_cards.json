@@ -1,0 +1,730 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "last_updated": "2024-09-29",
+    "total_cards": 108,
+    "description": "Comprehensive Clash Royale card database with elixir costs, rarities, and types"
+  },
+  "cards": {
+    "skeletons": {
+      "name": "Skeletons",
+      "elixir_cost": 1,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Three fast, very weak melee fighters. Skeletons are the only thing that spawns from the Tombstone!"
+    },
+    "ice_spirit": {
+      "name": "Ice Spirit",
+      "elixir_cost": 1,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_8",
+      "description": "Spawns one fast, weak ice spirit that freezes enemies."
+    },
+    "fire_spirit": {
+      "name": "Fire Spirit",
+      "elixir_cost": 1,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_5",
+      "description": "Spawns one fast, weak fire spirit that deals area damage."
+    },
+    "bats": {
+      "name": "Bats",
+      "elixir_cost": 1,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_5",
+      "description": "Three fast, very weak flying creatures. Bats are the only thing that spawns from the Tombstone!"
+    },
+    "goblins": {
+      "name": "Goblins",
+      "elixir_cost": 2,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_1",
+      "description": "Three fast, very weak melee fighters. Goblins are the only thing that spawns from the Goblin Hut!"
+    },
+    "spear_goblins": {
+      "name": "Spear Goblins",
+      "elixir_cost": 2,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_1",
+      "description": "Three fast, very weak ranged fighters. Spear Goblins are the only thing that spawns from the Goblin Hut!"
+    },
+    "ice_golem": {
+      "name": "Ice Golem",
+      "elixir_cost": 2,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_8",
+      "description": "A slow, weak tank that freezes enemies when destroyed."
+    },
+    "guards": {
+      "name": "Guards",
+      "elixir_cost": 2,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_7",
+      "description": "Three fast, very weak melee fighters with shields."
+    },
+    "archers": {
+      "name": "Archers",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_1",
+      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things."
+    },
+    "knight": {
+      "name": "Knight",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_1",
+      "description": "A tough melee fighter. The Barbarian's handsome, cultured cousin. Rumor has it that he was knighted based on the sheer awesomeness of his mustache alone."
+    },
+    "bomber": {
+      "name": "Bomber",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Small, lightly protected skeleton that throws bombs. Deals area damage that won't hurt him."
+    },
+    "skeleton_army": {
+      "name": "Skeleton Army",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Spawns an army of skeletons. Meet Larry and his friends Harry, Gary, Jerry, Larry, Terry, Barry, Mary, and Carey."
+    },
+    "minions": {
+      "name": "Minions",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_4",
+      "description": "Three fast, very weak flying creatures. Minions are the only thing that spawns from the Minion Horde!"
+    },
+    "musketeer": {
+      "name": "Musketeer",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_1",
+      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter."
+    },
+    "giant_skeleton": {
+      "name": "Giant Skeleton",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Giant Skeleton dies."
+    },
+    "witch": {
+      "name": "Witch",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+    },
+    "baby_dragon": {
+      "name": "Baby Dragon",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Flying troop that deals splash damage. Baby Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "prince": {
+      "name": "Prince",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Don't be fooled by his delicate appearance. He's a deadly melee fighter with a devastating charge attack."
+    },
+    "wizard": {
+      "name": "Wizard",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "The most awesome man to ever set foot in the arena! The Wizard will throw fireballs, and he will throw them well."
+    },
+    "mini_pekka": {
+      "name": "Mini P.E.K.K.A",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "The Arena is a certified butterfly-free zone. It's also a certified Mini P.E.K.K.A-free zone."
+    },
+    "valkyrie": {
+      "name": "Valkyrie",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Tough melee fighter that deals splash damage. She's got a mean streak a mile wide."
+    },
+    "hog_rider": {
+      "name": "Hog Rider",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+    },
+    "goblin_barrel": {
+      "name": "Goblin Barrel",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "spell",
+      "arena": "arena_2",
+      "description": "Spawns three Goblins anywhere in the Arena. It's going to be a magical experience!"
+    },
+    "skeleton_barrel": {
+      "name": "Skeleton Barrel",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Spawns a barrel of skeletons anywhere in the Arena. It's going to be a magical experience!"
+    },
+    "dart_goblin": {
+      "name": "Dart Goblin",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast, very weak ranged fighter. Dart Goblins are the only thing that spawns from the Goblin Hut!"
+    },
+    "goblin_gang": {
+      "name": "Goblin Gang",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Spawns three Goblins and two Spear Goblins. It's going to be a magical experience!"
+    },
+    "bandit": {
+      "name": "Bandit",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that dashes to her target. She's got a mean streak a mile wide."
+    },
+    "night_witch": {
+      "name": "Night Witch",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+    },
+    "mega_minion": {
+      "name": "Mega Minion",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Mega Minion hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "inferno_dragon": {
+      "name": "Inferno Dragon",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Inferno Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "lumberjack": {
+      "name": "Lumberjack",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+    },
+    "battle_ram": {
+      "name": "Battle Ram",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+    },
+    "zappies": {
+      "name": "Zappies",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Three fast, very weak ranged fighters. Zappies are the only thing that spawns from the Goblin Hut!"
+    },
+    "flying_machine": {
+      "name": "Flying Machine",
+      "elixir_cost": 3,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Flying Machine hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "magic_archer": {
+      "name": "Magic Archer",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+    },
+    "royal_recruits": {
+      "name": "Royal Recruits",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things."
+    },
+    "rascals": {
+      "name": "Rascals",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Three fast, very weak melee fighters. Rascals are the only thing that spawns from the Goblin Hut!"
+    },
+    "mega_knight": {
+      "name": "Mega Knight",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Mega Knight dies."
+    },
+    "electro_dragon": {
+      "name": "Electro Dragon",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Electro Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "elixir_golem": {
+      "name": "Elixir Golem",
+      "elixir_cost": 3,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "A slow, weak tank that freezes enemies when destroyed."
+    },
+    "heal_spirit": {
+      "name": "Heal Spirit",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Spawns one fast, weak heal spirit that heals allies."
+    },
+    "skeleton_dragons": {
+      "name": "Skeleton Dragons",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Skeleton Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "mother_witch": {
+      "name": "Mother Witch",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+    },
+    "electro_spirit": {
+      "name": "Electro Spirit",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Spawns one fast, weak electro spirit that stuns enemies."
+    },
+    "firecracker": {
+      "name": "Firecracker",
+      "elixir_cost": 3,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast, very weak ranged fighter. Firecrackers are the only thing that spawns from the Goblin Hut!"
+    },
+    "skeleton_king": {
+      "name": "Skeleton King",
+      "elixir_cost": 3,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Skeleton King dies."
+    },
+    "archer_queen": {
+      "name": "Archer Queen",
+      "elixir_cost": 3,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter."
+    },
+    "golden_knight": {
+      "name": "Golden Knight",
+      "elixir_cost": 3,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+    },
+    "monk": {
+      "name": "Monk",
+      "elixir_cost": 3,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+    },
+    "phoenix": {
+      "name": "Phoenix",
+      "elixir_cost": 3,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Phoenix hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "little_prince": {
+      "name": "Little Prince",
+      "elixir_cost": 3,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+    },
+    "giant": {
+      "name": "Giant",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_1",
+      "description": "Slow but durable, only attacks buildings. A real one-man wrecking crew!"
+    },
+    "dragon": {
+      "name": "Dragon",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Flying troop that deals splash damage. Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "skeleton_army_4": {
+      "name": "Skeleton Army",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Spawns an army of skeletons. Meet Larry and his friends Harry, Gary, Jerry, Larry, Terry, Barry, Mary, and Carey."
+    },
+    "witch_4": {
+      "name": "Witch",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+    },
+    "baby_dragon_4": {
+      "name": "Baby Dragon",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Flying troop that deals splash damage. Baby Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "prince_4": {
+      "name": "Prince",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Don't be fooled by his delicate appearance. He's a deadly melee fighter with a devastating charge attack."
+    },
+    "wizard_4": {
+      "name": "Wizard",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "The most awesome man to ever set foot in the arena! The Wizard will throw fireballs, and he will throw them well."
+    },
+    "mini_pekka_4": {
+      "name": "Mini P.E.K.K.A",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "The Arena is a certified butterfly-free zone. It's also a certified Mini P.E.K.K.A-free zone."
+    },
+    "valkyrie_4": {
+      "name": "Valkyrie",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Tough melee fighter that deals splash damage. She's got a mean streak a mile wide."
+    },
+    "hog_rider_4": {
+      "name": "Hog Rider",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+    },
+    "goblin_barrel_4": {
+      "name": "Goblin Barrel",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "spell",
+      "arena": "arena_2",
+      "description": "Spawns three Goblins anywhere in the Arena. It's going to be a magical experience!"
+    },
+    "skeleton_barrel_4": {
+      "name": "Skeleton Barrel",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_2",
+      "description": "Spawns a barrel of skeletons anywhere in the Arena. It's going to be a magical experience!"
+    },
+    "dart_goblin_4": {
+      "name": "Dart Goblin",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast, very weak ranged fighter. Dart Goblins are the only thing that spawns from the Goblin Hut!"
+    },
+    "goblin_gang_4": {
+      "name": "Goblin Gang",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Spawns three Goblins and two Spear Goblins. It's going to be a magical experience!"
+    },
+    "bandit_4": {
+      "name": "Bandit",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that dashes to her target. She's got a mean streak a mile wide."
+    },
+    "night_witch_4": {
+      "name": "Night Witch",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+    },
+    "mega_minion_4": {
+      "name": "Mega Minion",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Mega Minion hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "inferno_dragon_4": {
+      "name": "Inferno Dragon",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Inferno Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "lumberjack_4": {
+      "name": "Lumberjack",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+    },
+    "battle_ram_4": {
+      "name": "Battle Ram",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+    },
+    "zappies_4": {
+      "name": "Zappies",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Three fast, very weak ranged fighters. Zappies are the only thing that spawns from the Goblin Hut!"
+    },
+    "flying_machine_4": {
+      "name": "Flying Machine",
+      "elixir_cost": 4,
+      "rarity": "rare",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Flying Machine hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "magic_archer_4": {
+      "name": "Magic Archer",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+    },
+    "royal_recruits_4": {
+      "name": "Royal Recruits",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things."
+    },
+    "rascals_4": {
+      "name": "Rascals",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Three fast, very weak melee fighters. Rascals are the only thing that spawns from the Goblin Hut!"
+    },
+    "mega_knight_4": {
+      "name": "Mega Knight",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Mega Knight dies."
+    },
+    "electro_dragon_4": {
+      "name": "Electro Dragon",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Electro Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "elixir_golem_4": {
+      "name": "Elixir Golem",
+      "elixir_cost": 4,
+      "rarity": "epic",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "A slow, weak tank that freezes enemies when destroyed."
+    },
+    "heal_spirit_4": {
+      "name": "Heal Spirit",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Spawns one fast, weak heal spirit that heals allies."
+    },
+    "skeleton_dragons_4": {
+      "name": "Skeleton Dragons",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Skeleton Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "mother_witch_4": {
+      "name": "Mother Witch",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+    },
+    "electro_spirit_4": {
+      "name": "Electro Spirit",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Spawns one fast, weak electro spirit that stuns enemies."
+    },
+    "firecracker_4": {
+      "name": "Firecracker",
+      "elixir_cost": 4,
+      "rarity": "common",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast, very weak ranged fighter. Firecrackers are the only thing that spawns from the Goblin Hut!"
+    },
+    "skeleton_king_4": {
+      "name": "Skeleton King",
+      "elixir_cost": 4,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Skeleton King dies."
+    },
+    "archer_queen_4": {
+      "name": "Archer Queen",
+      "elixir_cost": 4,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter."
+    },
+    "golden_knight_4": {
+      "name": "Golden Knight",
+      "elixir_cost": 4,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+    },
+    "monk_4": {
+      "name": "Monk",
+      "elixir_cost": 4,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+    },
+    "phoenix_4": {
+      "name": "Phoenix",
+      "elixir_cost": 4,
+      "rarity": "legendary",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Flying troop that deals splash damage. Phoenix hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+    },
+    "little_prince_4": {
+      "name": "Little Prince",
+      "elixir_cost": 4,
+      "rarity": "champion",
+      "type": "troop",
+      "arena": "arena_9",
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+    }
+  }
+}
