@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "image_W": 3024,
+    "image_H": 1964,
+    "created_at": "2025-09-29T17:55:09.804108Z",
+    "notes": "First-pass calibration (viewport, card row, centers)"
+  },
+  "viewport": {
+    "x_r": 0.19246031746031747,
+    "y_r": 0.10743380855397149,
+    "w_r": 0.31,
+    "h_r": 0.65
+  },
+  "card_row": {
+    "top_r": 0.876911871813547,
+    "bottom_r": 0.9366351056081573
+  },
+  "cards": {
+    "centers_x_r": [
+      0.12817362817362818,
+      0.32882882882882886,
+      0.631040131040131,
+      0.9066339066339066
+    ],
+    "width_r": 0.12,
+    "top_offset_r": 0.1,
+    "bottom_offset_r": 0.1
+  },
+  "elixir_roi": {
+    "x_off_r": 0.08,
+    "y_off_r": 0.62,
+    "w_r": 0.22,
+    "h_r": 0.28
+  }
+}

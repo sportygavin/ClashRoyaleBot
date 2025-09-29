@@ -1,0 +1,35 @@
+{
+  "metadata": {
+    "image_W": 3024,
+    "image_H": 1964,
+    "created_at": "2025-09-29T18:10:00.000000Z",
+    "notes": "Manual calibration from user clicks - exact coordinates"
+  },
+  "viewport": {
+    "x_r": 0.192791,
+    "y_r": 0.072811,
+    "w_r": 0.308201,
+    "h_r": 0.841141
+  },
+  "card_row": {
+    "top_r": 0.834140,
+    "bottom_r": 0.952785
+  },
+  "cards": {
+    "centers_x_r": [
+      0.305794,
+      0.496781,
+      0.693133,
+      0.877682
+    ],
+    "width_r": 0.12,
+    "top_offset_r": 0.1,
+    "bottom_offset_r": 0.1
+  },
+  "elixir_roi": {
+    "x_off_r": 0.08,
+    "y_off_r": 0.62,
+    "w_r": 0.22,
+    "h_r": 0.28
+  }
+}
