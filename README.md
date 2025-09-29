@@ -51,7 +51,7 @@ The bot consists of five main components:
    python main.py
    ```
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 ClashRoyaleBot/
