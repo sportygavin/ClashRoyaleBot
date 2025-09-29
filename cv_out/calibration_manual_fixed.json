@@ -22,14 +22,14 @@
       0.693133,
       0.877682
     ],
-    "width_r": 0.12,
-    "top_offset_r": 0.1,
-    "bottom_offset_r": 0.1
+    "width_r": 0.18,
+    "top_offset_r": 0.05,
+    "bottom_offset_r": 0.05
   },
   "elixir_roi": {
-    "x_off_r": 0.08,
-    "y_off_r": 0.62,
-    "w_r": 0.22,
-    "h_r": 0.28
+    "x_off_r": 0.35,
+    "y_off_r": 0.70,
+    "w_r": 0.30,
+    "h_r": 0.30
   }
 }
