@@ -12,7 +12,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Three fast, very weak melee fighters. Skeletons are the only thing that spawns from the Tombstone!"
+      "description": "Three fast, very weak melee fighters. Skeletons are the only thing that spawns from the Tombstone!",
+      "placement_strategy": "behind_tank"
     },
     "ice_spirit": {
       "name": "Ice Spirit",
@@ -20,7 +21,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_8",
-      "description": "Spawns one fast, weak ice spirit that freezes enemies."
+      "description": "Spawns one fast, weak ice spirit that freezes enemies.",
+      "placement_strategy": "behind_tank"
     },
     "fire_spirit": {
       "name": "Fire Spirit",
@@ -28,7 +30,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_5",
-      "description": "Spawns one fast, weak fire spirit that deals area damage."
+      "description": "Spawns one fast, weak fire spirit that deals area damage.",
+      "placement_strategy": "near_towers"
     },
     "bats": {
       "name": "Bats",
@@ -36,7 +39,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_5",
-      "description": "Three fast, very weak flying creatures. Bats are the only thing that spawns from the Tombstone!"
+      "description": "Three fast, very weak flying creatures. Bats are the only thing that spawns from the Tombstone!",
+      "placement_strategy": "behind_tank"
     },
     "goblins": {
       "name": "Goblins",
@@ -44,7 +48,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_1",
-      "description": "Three fast, very weak melee fighters. Goblins are the only thing that spawns from the Goblin Hut!"
+      "description": "Three fast, very weak melee fighters. Goblins are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "behind_tank"
     },
     "spear_goblins": {
       "name": "Spear Goblins",
@@ -52,7 +57,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_1",
-      "description": "Three fast, very weak ranged fighters. Spear Goblins are the only thing that spawns from the Goblin Hut!"
+      "description": "Three fast, very weak ranged fighters. Spear Goblins are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "behind_tank"
     },
     "ice_golem": {
       "name": "Ice Golem",
@@ -60,7 +66,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_8",
-      "description": "A slow, weak tank that freezes enemies when destroyed."
+      "description": "A slow, weak tank that freezes enemies when destroyed.",
+      "placement_strategy": "near_towers"
     },
     "guards": {
       "name": "Guards",
@@ -68,7 +75,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_7",
-      "description": "Three fast, very weak melee fighters with shields."
+      "description": "Three fast, very weak melee fighters with shields.",
+      "placement_strategy": "near_towers"
     },
     "archers": {
       "name": "Archers",
@@ -76,7 +84,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_1",
-      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things."
+      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things.",
+      "placement_strategy": "behind_tank"
     },
     "knight": {
       "name": "Knight",
@@ -84,7 +93,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_1",
-      "description": "A tough melee fighter. The Barbarian's handsome, cultured cousin. Rumor has it that he was knighted based on the sheer awesomeness of his mustache alone."
+      "description": "A tough melee fighter. The Barbarian's handsome, cultured cousin. Rumor has it that he was knighted based on the sheer awesomeness of his mustache alone.",
+      "placement_strategy": "bridge_front"
     },
     "bomber": {
       "name": "Bomber",
@@ -92,7 +102,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Small, lightly protected skeleton that throws bombs. Deals area damage that won't hurt him."
+      "description": "Small, lightly protected skeleton that throws bombs. Deals area damage that won't hurt him.",
+      "placement_strategy": "near_towers"
     },
     "skeleton_army": {
       "name": "Skeleton Army",
@@ -100,7 +111,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Spawns an army of skeletons. Meet Larry and his friends Harry, Gary, Jerry, Larry, Terry, Barry, Mary, and Carey."
+      "description": "Spawns an army of skeletons. Meet Larry and his friends Harry, Gary, Jerry, Larry, Terry, Barry, Mary, and Carey.",
+      "placement_strategy": "behind_tank"
     },
     "minions": {
       "name": "Minions",
@@ -108,7 +120,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_4",
-      "description": "Three fast, very weak flying creatures. Minions are the only thing that spawns from the Minion Horde!"
+      "description": "Three fast, very weak flying creatures. Minions are the only thing that spawns from the Minion Horde!",
+      "placement_strategy": "behind_tank"
     },
     "musketeer": {
       "name": "Musketeer",
@@ -116,7 +129,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_1",
-      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter."
+      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter.",
+      "placement_strategy": "behind_tank"
     },
     "giant_skeleton": {
       "name": "Giant Skeleton",
@@ -124,7 +138,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Giant Skeleton dies."
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Giant Skeleton dies.",
+      "placement_strategy": "bridge_front"
     },
     "witch": {
       "name": "Witch",
@@ -132,7 +147,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise.",
+      "placement_strategy": "behind_tank"
     },
     "baby_dragon": {
       "name": "Baby Dragon",
@@ -140,7 +156,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Flying troop that deals splash damage. Baby Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Baby Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "prince": {
       "name": "Prince",
@@ -148,7 +165,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Don't be fooled by his delicate appearance. He's a deadly melee fighter with a devastating charge attack."
+      "description": "Don't be fooled by his delicate appearance. He's a deadly melee fighter with a devastating charge attack.",
+      "placement_strategy": "bridge_front"
     },
     "wizard": {
       "name": "Wizard",
@@ -156,7 +174,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "The most awesome man to ever set foot in the arena! The Wizard will throw fireballs, and he will throw them well."
+      "description": "The most awesome man to ever set foot in the arena! The Wizard will throw fireballs, and he will throw them well.",
+      "placement_strategy": "behind_tank"
     },
     "mini_pekka": {
       "name": "Mini P.E.K.K.A",
@@ -164,7 +183,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "The Arena is a certified butterfly-free zone. It's also a certified Mini P.E.K.K.A-free zone."
+      "description": "The Arena is a certified butterfly-free zone. It's also a certified Mini P.E.K.K.A-free zone.",
+      "placement_strategy": "bridge_front"
     },
     "valkyrie": {
       "name": "Valkyrie",
@@ -172,7 +192,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Tough melee fighter that deals splash damage. She's got a mean streak a mile wide."
+      "description": "Tough melee fighter that deals splash damage. She's got a mean streak a mile wide.",
+      "placement_strategy": "bridge_front"
     },
     "hog_rider": {
       "name": "Hog Rider",
@@ -180,7 +201,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side.",
+      "placement_strategy": "bridge_front"
     },
     "goblin_barrel": {
       "name": "Goblin Barrel",
@@ -188,7 +210,8 @@
       "rarity": "epic",
       "type": "spell",
       "arena": "arena_2",
-      "description": "Spawns three Goblins anywhere in the Arena. It's going to be a magical experience!"
+      "description": "Spawns three Goblins anywhere in the Arena. It's going to be a magical experience!",
+      "placement_strategy": "enemy_side"
     },
     "skeleton_barrel": {
       "name": "Skeleton Barrel",
@@ -196,7 +219,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Spawns a barrel of skeletons anywhere in the Arena. It's going to be a magical experience!"
+      "description": "Spawns a barrel of skeletons anywhere in the Arena. It's going to be a magical experience!",
+      "placement_strategy": "bridge_front"
     },
     "dart_goblin": {
       "name": "Dart Goblin",
@@ -204,7 +228,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast, very weak ranged fighter. Dart Goblins are the only thing that spawns from the Goblin Hut!"
+      "description": "Fast, very weak ranged fighter. Dart Goblins are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "near_towers"
     },
     "goblin_gang": {
       "name": "Goblin Gang",
@@ -212,7 +237,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Spawns three Goblins and two Spear Goblins. It's going to be a magical experience!"
+      "description": "Spawns three Goblins and two Spear Goblins. It's going to be a magical experience!",
+      "placement_strategy": "behind_tank"
     },
     "bandit": {
       "name": "Bandit",
@@ -220,7 +246,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that dashes to her target. She's got a mean streak a mile wide."
+      "description": "Fast melee fighter that dashes to her target. She's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "night_witch": {
       "name": "Night Witch",
@@ -228,7 +255,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise.",
+      "placement_strategy": "near_towers"
     },
     "mega_minion": {
       "name": "Mega Minion",
@@ -236,7 +264,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Mega Minion hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Mega Minion hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "inferno_dragon": {
       "name": "Inferno Dragon",
@@ -244,7 +273,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Inferno Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Inferno Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "lumberjack": {
       "name": "Lumberjack",
@@ -252,7 +282,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "battle_ram": {
       "name": "Battle Ram",
@@ -260,7 +291,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side.",
+      "placement_strategy": "bridge_front"
     },
     "zappies": {
       "name": "Zappies",
@@ -268,7 +300,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Three fast, very weak ranged fighters. Zappies are the only thing that spawns from the Goblin Hut!"
+      "description": "Three fast, very weak ranged fighters. Zappies are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "behind_tank"
     },
     "flying_machine": {
       "name": "Flying Machine",
@@ -276,7 +309,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Flying Machine hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Flying Machine hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "magic_archer": {
       "name": "Magic Archer",
@@ -284,7 +318,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter.",
+      "placement_strategy": "behind_tank"
     },
     "royal_recruits": {
       "name": "Royal Recruits",
@@ -292,7 +327,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things."
+      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things.",
+      "placement_strategy": "bridge_front"
     },
     "rascals": {
       "name": "Rascals",
@@ -300,7 +336,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Three fast, very weak melee fighters. Rascals are the only thing that spawns from the Goblin Hut!"
+      "description": "Three fast, very weak melee fighters. Rascals are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "behind_tank"
     },
     "mega_knight": {
       "name": "Mega Knight",
@@ -308,7 +345,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Mega Knight dies."
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Mega Knight dies.",
+      "placement_strategy": "bridge_front"
     },
     "electro_dragon": {
       "name": "Electro Dragon",
@@ -316,7 +354,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Electro Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Electro Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "elixir_golem": {
       "name": "Elixir Golem",
@@ -324,7 +363,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_9",
-      "description": "A slow, weak tank that freezes enemies when destroyed."
+      "description": "A slow, weak tank that freezes enemies when destroyed.",
+      "placement_strategy": "bridge_front"
     },
     "heal_spirit": {
       "name": "Heal Spirit",
@@ -332,7 +372,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Spawns one fast, weak heal spirit that heals allies."
+      "description": "Spawns one fast, weak heal spirit that heals allies.",
+      "placement_strategy": "behind_tank"
     },
     "skeleton_dragons": {
       "name": "Skeleton Dragons",
@@ -340,7 +381,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Skeleton Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Skeleton Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "mother_witch": {
       "name": "Mother Witch",
@@ -348,7 +390,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise.",
+      "placement_strategy": "near_towers"
     },
     "electro_spirit": {
       "name": "Electro Spirit",
@@ -356,7 +399,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Spawns one fast, weak electro spirit that stuns enemies."
+      "description": "Spawns one fast, weak electro spirit that stuns enemies.",
+      "placement_strategy": "near_towers"
     },
     "firecracker": {
       "name": "Firecracker",
@@ -364,7 +408,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast, very weak ranged fighter. Firecrackers are the only thing that spawns from the Goblin Hut!"
+      "description": "Fast, very weak ranged fighter. Firecrackers are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "near_towers"
     },
     "skeleton_king": {
       "name": "Skeleton King",
@@ -372,7 +417,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Skeleton King dies."
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Skeleton King dies.",
+      "placement_strategy": "bridge_front"
     },
     "archer_queen": {
       "name": "Archer Queen",
@@ -380,7 +426,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter."
+      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter.",
+      "placement_strategy": "near_towers"
     },
     "golden_knight": {
       "name": "Golden Knight",
@@ -388,7 +435,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide.",
+      "placement_strategy": "bridge_front"
     },
     "monk": {
       "name": "Monk",
@@ -396,7 +444,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "phoenix": {
       "name": "Phoenix",
@@ -404,7 +453,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Phoenix hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Phoenix hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "behind_tank"
     },
     "little_prince": {
       "name": "Little Prince",
@@ -412,7 +462,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter.",
+      "placement_strategy": "behind_tank"
     },
     "giant": {
       "name": "Giant",
@@ -420,7 +471,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_1",
-      "description": "Slow but durable, only attacks buildings. A real one-man wrecking crew!"
+      "description": "Slow but durable, only attacks buildings. A real one-man wrecking crew!",
+      "placement_strategy": "bridge_front"
     },
     "dragon": {
       "name": "Dragon",
@@ -428,7 +480,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Flying troop that deals splash damage. Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "skeleton_army_4": {
       "name": "Skeleton Army",
@@ -436,7 +489,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Spawns an army of skeletons. Meet Larry and his friends Harry, Gary, Jerry, Larry, Terry, Barry, Mary, and Carey."
+      "description": "Spawns an army of skeletons. Meet Larry and his friends Harry, Gary, Jerry, Larry, Terry, Barry, Mary, and Carey.",
+      "placement_strategy": "near_towers"
     },
     "witch_4": {
       "name": "Witch",
@@ -444,7 +498,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise.",
+      "placement_strategy": "near_towers"
     },
     "baby_dragon_4": {
       "name": "Baby Dragon",
@@ -452,7 +507,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Flying troop that deals splash damage. Baby Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Baby Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "prince_4": {
       "name": "Prince",
@@ -460,7 +516,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Don't be fooled by his delicate appearance. He's a deadly melee fighter with a devastating charge attack."
+      "description": "Don't be fooled by his delicate appearance. He's a deadly melee fighter with a devastating charge attack.",
+      "placement_strategy": "near_towers"
     },
     "wizard_4": {
       "name": "Wizard",
@@ -468,7 +525,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "The most awesome man to ever set foot in the arena! The Wizard will throw fireballs, and he will throw them well."
+      "description": "The most awesome man to ever set foot in the arena! The Wizard will throw fireballs, and he will throw them well.",
+      "placement_strategy": "near_towers"
     },
     "mini_pekka_4": {
       "name": "Mini P.E.K.K.A",
@@ -476,7 +534,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "The Arena is a certified butterfly-free zone. It's also a certified Mini P.E.K.K.A-free zone."
+      "description": "The Arena is a certified butterfly-free zone. It's also a certified Mini P.E.K.K.A-free zone.",
+      "placement_strategy": "near_towers"
     },
     "valkyrie_4": {
       "name": "Valkyrie",
@@ -484,7 +543,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Tough melee fighter that deals splash damage. She's got a mean streak a mile wide."
+      "description": "Tough melee fighter that deals splash damage. She's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "hog_rider_4": {
       "name": "Hog Rider",
@@ -492,7 +552,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side.",
+      "placement_strategy": "near_towers"
     },
     "goblin_barrel_4": {
       "name": "Goblin Barrel",
@@ -500,7 +561,8 @@
       "rarity": "epic",
       "type": "spell",
       "arena": "arena_2",
-      "description": "Spawns three Goblins anywhere in the Arena. It's going to be a magical experience!"
+      "description": "Spawns three Goblins anywhere in the Arena. It's going to be a magical experience!",
+      "placement_strategy": "near_towers"
     },
     "skeleton_barrel_4": {
       "name": "Skeleton Barrel",
@@ -508,7 +570,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_2",
-      "description": "Spawns a barrel of skeletons anywhere in the Arena. It's going to be a magical experience!"
+      "description": "Spawns a barrel of skeletons anywhere in the Arena. It's going to be a magical experience!",
+      "placement_strategy": "near_towers"
     },
     "dart_goblin_4": {
       "name": "Dart Goblin",
@@ -516,7 +579,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast, very weak ranged fighter. Dart Goblins are the only thing that spawns from the Goblin Hut!"
+      "description": "Fast, very weak ranged fighter. Dart Goblins are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "near_towers"
     },
     "goblin_gang_4": {
       "name": "Goblin Gang",
@@ -524,7 +588,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Spawns three Goblins and two Spear Goblins. It's going to be a magical experience!"
+      "description": "Spawns three Goblins and two Spear Goblins. It's going to be a magical experience!",
+      "placement_strategy": "near_towers"
     },
     "bandit_4": {
       "name": "Bandit",
@@ -532,7 +597,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that dashes to her target. She's got a mean streak a mile wide."
+      "description": "Fast melee fighter that dashes to her target. She's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "night_witch_4": {
       "name": "Night Witch",
@@ -540,7 +606,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise.",
+      "placement_strategy": "near_towers"
     },
     "mega_minion_4": {
       "name": "Mega Minion",
@@ -548,7 +615,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Mega Minion hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Mega Minion hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "inferno_dragon_4": {
       "name": "Inferno Dragon",
@@ -556,7 +624,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Inferno Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Inferno Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "lumberjack_4": {
       "name": "Lumberjack",
@@ -564,7 +633,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "battle_ram_4": {
       "name": "Battle Ram",
@@ -572,7 +642,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side."
+      "description": "Fast melee troop that targets buildings. Can jump over the river to get to the other side.",
+      "placement_strategy": "near_towers"
     },
     "zappies_4": {
       "name": "Zappies",
@@ -580,7 +651,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Three fast, very weak ranged fighters. Zappies are the only thing that spawns from the Goblin Hut!"
+      "description": "Three fast, very weak ranged fighters. Zappies are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "near_towers"
     },
     "flying_machine_4": {
       "name": "Flying Machine",
@@ -588,7 +660,8 @@
       "rarity": "rare",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Flying Machine hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Flying Machine hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "magic_archer_4": {
       "name": "Magic Archer",
@@ -596,7 +669,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter.",
+      "placement_strategy": "near_towers"
     },
     "royal_recruits_4": {
       "name": "Royal Recruits",
@@ -604,7 +678,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things."
+      "description": "A pair of lightly armored ranged attackers. They're really good at shooting things.",
+      "placement_strategy": "near_towers"
     },
     "rascals_4": {
       "name": "Rascals",
@@ -612,7 +687,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Three fast, very weak melee fighters. Rascals are the only thing that spawns from the Goblin Hut!"
+      "description": "Three fast, very weak melee fighters. Rascals are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "near_towers"
     },
     "mega_knight_4": {
       "name": "Mega Knight",
@@ -620,7 +696,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Mega Knight dies."
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Mega Knight dies.",
+      "placement_strategy": "near_towers"
     },
     "electro_dragon_4": {
       "name": "Electro Dragon",
@@ -628,7 +705,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Electro Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Electro Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "elixir_golem_4": {
       "name": "Elixir Golem",
@@ -636,7 +714,8 @@
       "rarity": "epic",
       "type": "troop",
       "arena": "arena_9",
-      "description": "A slow, weak tank that freezes enemies when destroyed."
+      "description": "A slow, weak tank that freezes enemies when destroyed.",
+      "placement_strategy": "near_towers"
     },
     "heal_spirit_4": {
       "name": "Heal Spirit",
@@ -644,7 +723,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Spawns one fast, weak heal spirit that heals allies."
+      "description": "Spawns one fast, weak heal spirit that heals allies.",
+      "placement_strategy": "near_towers"
     },
     "skeleton_dragons_4": {
       "name": "Skeleton Dragons",
@@ -652,7 +732,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Skeleton Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Skeleton Dragon hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "mother_witch_4": {
       "name": "Mother Witch",
@@ -660,7 +741,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise."
+      "description": "Summons skeletons to do her bidding, even after death! If you touch her, prepare for a fiery surprise.",
+      "placement_strategy": "near_towers"
     },
     "electro_spirit_4": {
       "name": "Electro Spirit",
@@ -668,7 +750,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Spawns one fast, weak electro spirit that stuns enemies."
+      "description": "Spawns one fast, weak electro spirit that stuns enemies.",
+      "placement_strategy": "near_towers"
     },
     "firecracker_4": {
       "name": "Firecracker",
@@ -676,7 +759,8 @@
       "rarity": "common",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast, very weak ranged fighter. Firecrackers are the only thing that spawns from the Goblin Hut!"
+      "description": "Fast, very weak ranged fighter. Firecrackers are the only thing that spawns from the Goblin Hut!",
+      "placement_strategy": "near_towers"
     },
     "skeleton_king_4": {
       "name": "Skeleton King",
@@ -684,7 +768,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Skeleton King dies."
+      "description": "The bigger the skeleton, the bigger the bomb. Carries a bomb that blows up when the Skeleton King dies.",
+      "placement_strategy": "near_towers"
     },
     "archer_queen_4": {
       "name": "Archer Queen",
@@ -692,7 +777,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter."
+      "description": "Don't be fooled by her delicate appearance. She's a deadly ranged fighter.",
+      "placement_strategy": "near_towers"
     },
     "golden_knight_4": {
       "name": "Golden Knight",
@@ -700,7 +786,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "monk_4": {
       "name": "Monk",
@@ -708,7 +795,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide."
+      "description": "Fast melee fighter that deals splash damage. He's got a mean streak a mile wide.",
+      "placement_strategy": "near_towers"
     },
     "phoenix_4": {
       "name": "Phoenix",
@@ -716,7 +804,8 @@
       "rarity": "legendary",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Flying troop that deals splash damage. Phoenix hatchlings are adorable, but don't let that fool you - they're still dangerous!"
+      "description": "Flying troop that deals splash damage. Phoenix hatchlings are adorable, but don't let that fool you - they're still dangerous!",
+      "placement_strategy": "near_towers"
     },
     "little_prince_4": {
       "name": "Little Prince",
@@ -724,7 +813,8 @@
       "rarity": "champion",
       "type": "troop",
       "arena": "arena_9",
-      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter."
+      "description": "Don't be fooled by his delicate appearance. He's a deadly ranged fighter.",
+      "placement_strategy": "near_towers"
     }
   }
 }

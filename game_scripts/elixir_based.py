@@ -1,8 +1,13 @@
 import argparse
 import time
 import random
+import sys
+import os
 
 from typing import List, Tuple, Optional
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_scripts.strategy_utils import (
     load_calibration,
@@ -46,12 +51,13 @@ def main():
         cur_elixir, econf = stable_elixir(crs, samples=5, delay_s=0.04)
 
         affordable: List[Tuple[int, int]] = []
-        if isinstance(hand_info, dict):
+        if isinstance(hand_info, dict) and cur_elixir is not None:
             for key in sorted(hand_info.keys()):
                 card = hand_info[key]
                 idx = card.get('card_number')
                 cost = (card.get('card_info') or {}).get('elixir_cost')
-                if isinstance(idx, int) and isinstance(cost, int) and cur_elixir is not None:
+                if isinstance(idx, int) and isinstance(cost, int):
+                    # Only add if we have enough elixir to play this card
                     if cur_elixir >= cost:
                         affordable.append((idx - 1, cost))
 

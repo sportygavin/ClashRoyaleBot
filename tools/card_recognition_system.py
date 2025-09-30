@@ -367,96 +367,66 @@ class CardRecognitionSystem:
         return variants
 
     def recognize_current_elixir(self, screenshot: np.ndarray) -> Tuple[Optional[int], float]:
-        """Recognize current elixir number using digit templates. Returns (elixir, confidence).
-        Supports '10' via dedicated template or split-ROI two-digit fallback.
-        """
-        region = self.extract_current_elixir_region(screenshot)
-        if region is None or not getattr(self, 'digit_templates', {}):
+        """Recognize current elixir by counting filled segments in elixir bar. Returns (elixir, confidence)."""
+        return self._detect_elixir_by_bar(screenshot)
+    
+    def _detect_elixir_by_bar(self, screenshot: np.ndarray) -> Tuple[Optional[int], float]:
+        """Detect elixir by counting filled segments in the elixir bar."""
+        # Get viewport
+        screen_w, screen_h = pyautogui.size()
+        viewport_r = self.calib.get('viewport') or {'x_r': 0.0, 'y_r': 0.0, 'w_r': 1.0, 'h_r': 1.0}
+        vx = int(viewport_r['x_r'] * screen_w)
+        vy = int(viewport_r['y_r'] * screen_h)
+        vw = int(viewport_r['w_r'] * screen_w)
+        vh = int(viewport_r['h_r'] * screen_h)
+        
+        # Get elixir bar region from calibration
+        if 'elixir_bar_roi' not in self.calib:
             return None, 0.0
-
-        variants = self._digit_preprocess_variants(region)
-        if not variants:
+            
+        bar_roi = self.calib['elixir_bar_roi']
+        bar_x_start = int(vx + bar_roi['x_r'] * vw)
+        bar_y_start = int(vy + bar_roi['y_r'] * vh)
+        bar_x_end = int(vx + (bar_roi['x_r'] + bar_roi['w_r']) * vw)
+        bar_y_end = int(vy + (bar_roi['y_r'] + bar_roi['h_r']) * vh)
+        
+        # Extract bar region
+        bar_region = screenshot[bar_y_start:bar_y_end, bar_x_start:bar_x_end]
+        
+        if bar_region.size == 0:
             return None, 0.0
-
-        def match_template(proc_img: np.ndarray, tmpl_img: np.ndarray) -> float:
-            th, tw = tmpl_img.shape[:2]
-            if th < 5 or tw < 5:
-                return 0.0
-            # Ensure template fits, scale down if needed
-            if th > proc_img.shape[0] or tw > proc_img.shape[1]:
-                scale = min(proc_img.shape[0] / max(th, 1), proc_img.shape[1] / max(tw, 1), 1.0)
-                th2 = max(int(th * scale), 5)
-                tw2 = max(int(tw * scale), 5)
-                tmpl_use = cv2.resize(tmpl_img, (tw2, th2), interpolation=cv2.INTER_AREA)
-            else:
-                tmpl_use = tmpl_img
-            res = cv2.matchTemplate(proc_img, tmpl_use, cv2.TM_CCOEFF_NORMED)
-            return float(cv2.minMaxLoc(res)[1])
-
-        best_label: Optional[str] = None
-        best_score: float = 0.0
-
-        # 1) Try matching whole ROI against available templates across variants
-        for proc in variants:
-            # Normalize height for stability (keep aspect)
-            target_h = 32
-            scale = target_h / max(proc.shape[0], 1)
-            proc_norm = cv2.resize(proc, (max(int(proc.shape[1] * scale), 8), target_h), interpolation=cv2.INTER_AREA)
-
-            for label, tmpl in self.digit_templates.items():
-                score = match_template(proc_norm, tmpl)
-                if score > best_score:
-                    best_score = score
-                    best_label = label
-
-        # 2) If no strong match, attempt split-ROI two-digit detection for '10'
-        # Heuristic: try when best < 0.7 or best predicts 5/8 often confused
-        if best_score < 0.7 or (best_label in {"5", "8", None}):
-            # Split into left/right halves (slightly biased to left digit narrower)
-            h, w = variants[0].shape[:2]
-            split_x = int(w * 0.52)
-            for proc in variants:
-                left = proc[:, :split_x]
-                right = proc[:, split_x:]
-
-                # Match left among 1-9 (expect '1' for 10)
-                left_best, left_score = None, 0.0
-                for d, tmpl in self.digit_templates.items():
-                    if d not in {"1", "2", "3", "4", "5", "6", "7", "8", "9"}:
-                        continue
-                    s = match_template(left, tmpl)
-                    if s > left_score:
-                        left_score, left_best = s, d
-
-                # Match right among 0-9 (expect '0' for 10)
-                right_best, right_score = None, 0.0
-                for d, tmpl in self.digit_templates.items():
-                    if d not in {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}:
-                        continue
-                    s = match_template(right, tmpl)
-                    if s > right_score:
-                        right_score, right_best = s, d
-
-                # If we found '1' and '0', propose 10 with conservative score
-                if left_best == "1" and right_best == "0":
-                    combined = min(left_score, right_score)
-                    if combined > best_score:
-                        best_label, best_score = "10", combined
-
-        # 3) If we have a dedicated '10' template, give it a final try across variants
-        if "10" in self.digit_templates:
-            tmpl10 = self.digit_templates["10"]
-            for proc in variants:
-                score = match_template(proc, tmpl10)
-                if score > best_score:
-                    best_label, best_score = "10", score
-
-        try:
-            elixir_val = int(best_label) if best_label is not None else None
-        except ValueError:
-            elixir_val = None
-
-        return elixir_val, float(best_score)
+        
+        # Convert to HSV for better color detection
+        hsv = cv2.cvtColor(bar_region, cv2.COLOR_BGR2HSV)
+        
+        # Define color ranges for filled (pink/magenta) segments
+        lower_pink = np.array([140, 50, 50])
+        upper_pink = np.array([180, 255, 255])
+        
+        # Create mask for filled segments
+        mask = cv2.inRange(hsv, lower_pink, upper_pink)
+        
+        # Count filled segments by dividing bar into 10 equal parts
+        bar_width = bar_x_end - bar_x_start
+        segment_width = bar_width // 10
+        filled_count = 0
+        
+        for i in range(10):
+            segment_x_start = i * segment_width
+            segment_x_end = (i + 1) * segment_width
+            segment = mask[:, segment_x_start:segment_x_end]
+            
+            # Count non-zero pixels in this segment
+            filled_pixels = np.count_nonzero(segment)
+            total_pixels = segment.size
+            
+            # If more than 30% of segment is filled, count it
+            if filled_pixels > total_pixels * 0.3:
+                filled_count += 1
+        
+        # Return the count with confidence
+        confidence = min(1.0, filled_count / 10.0 + 0.5)
+        return filled_count, confidence
     
     def recognize_card_by_template(self, card_img, threshold=0.3):
         """Recognize card using template matching."""

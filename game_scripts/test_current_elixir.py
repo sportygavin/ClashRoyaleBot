@@ -1,6 +1,11 @@
 import argparse
 import time
 from collections import Counter
+import sys
+import os
+
+# Add project root to path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from game_scripts.strategy_utils import screen_bgr
 from tools.card_recognition_system import CardRecognitionSystem
@@ -23,6 +28,11 @@ def main():
         if frame is None:
             time.sleep(interval)
             continue
+        
+        # Force debug image generation
+        debug_path = crs._save_elixir_debug(frame, tag=f"test_{len(history)}")
+        print(f"Debug images: {debug_path}")
+        
         v, c = crs.recognize_current_elixir(frame)
         history.append((v, c))
         print(f"elixir={v} conf={c:.2f}")
