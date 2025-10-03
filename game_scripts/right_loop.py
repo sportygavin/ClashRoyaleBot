@@ -16,7 +16,7 @@ from game_scripts.strategy_utils import (
 )
 from tools.card_recognition_system import CardRecognitionSystem
 
-
+# (Target Position for deploying cards)
 def right_lane_target(viewport_px):
     vx, vy, vw, vh = viewport_px
     x = vx + int(0.72 * vw)
