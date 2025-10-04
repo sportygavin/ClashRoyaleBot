@@ -22,7 +22,7 @@ def right_lane_target(viewport_px):
     x = vx + int(0.72 * vw)
     y = vy + int(0.62 * vh)
     return x, y
-
+#testing
 
 def main():
     parser = argparse.ArgumentParser(description='Repeatedly place cards on right lane front.')
