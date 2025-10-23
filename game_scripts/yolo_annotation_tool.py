@@ -21,27 +21,18 @@ class YOLOAnnotationTool:
         self.images_dir.mkdir(exist_ok=True)
         self.labels_dir.mkdir(exist_ok=True)
         
-        # Card classes
+        # Card classes - focused on common opponent cards
         self.card_classes = [
-            "Giant", "Archer", "Knight", "Fireball", "Musketeer", 
-            "PEKKA", "Golem", "Mega Knight", "Wizard", "Dragon",
-            "Skeleton", "Bomber", "Archers", "Goblins", "Spear Goblins",
-            "Skeletons", "Ice Spirit", "Fire Spirits", "Minions", "Hog Rider",
-            "Valkyrie", "Musketeer", "Witch", "Bomber", "Baby Dragon",
-            "Prince", "Dark Prince", "Wizard", "Mini PEKKA", "Giant Skeleton",
-            "Skeleton Army", "Bomber", "Cannon", "Tesla", "Inferno Tower",
-            "Bomb Tower", "Elixir Collector", "Barbarian Hut", "Tombstone",
-            "Furnace", "Goblin Hut", "Inferno Dragon", "Ice Wizard", "Lumberjack",
-            "Night Witch", "Bandit", "Royal Ghost", "Mega Knight", "Electro Wizard",
-            "Hunter", "Executioner", "Cannon Cart", "Mega Minion", "Dart Goblin",
-            "Goblin Gang", "Elite Barbarians", "Battle Ram", "Zappies", "Flying Machine",
-            "Magic Archer", "Skeleton Barrel", "Goblin Giant", "Fisherman", "Firecracker",
-            "Mighty Miner", "Elixir Golem", "Battle Healer", "Skeleton King", "Archer Queen",
-            "Golden Knight", "Monk", "Skeleton Dragons", "Mother Witch", "Electro Spirit",
-            "Electro Giant", "Cannon", "X-Bow", "Mortar", "Rocket", "Freeze",
-            "Rage", "Clone", "Heal", "Mirror", "Lightning", "Poison",
-            "Graveyard", "The Log", "Tornado", "Giant Snowball", "Barbarian Barrel",
-            "Royal Delivery", "Earthquake", "Goblin Barrel", "Fireball", "Arrows"
+            "Princess",      # 0
+            "Knight",        # 1
+            "Goblin Gang",   # 2
+            "Ice Spirit",    # 3
+            "The Log",       # 4
+            "Goblin Barrel", # 5
+            "Inferno Tower", # 6
+            "Spear Goblin",  # 7
+            "Goblin",        # 8
+            "Archer"         # 9
         ]
         
         # Current annotation state

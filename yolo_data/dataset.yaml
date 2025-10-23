@@ -1,0 +1,16 @@
+names:
+- Princess
+- Knight
+- Goblin Gang
+- Ice Spirit
+- The Log
+- Goblin Barrel
+- Inferno Tower
+- Spear Goblin
+- Goblin
+- Archer
+nc: 10
+path: /Users/gsheppard/ClashRoyaleBot/yolo_data
+test: images
+train: images
+val: images

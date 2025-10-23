@@ -61,19 +61,18 @@ class YOLOv8OpponentDetector:
         self.images_dir.mkdir(exist_ok=True)
         self.labels_dir.mkdir(exist_ok=True)
         
-        # Card classes (will expand as we collect data)
+        # Card classes - focused on common opponent cards
         self.card_classes = {
-            0: "Giant",
-            1: "Archer",
-            2: "Knight",
-            3: "Fireball",
-            4: "Musketeer",
-            5: "PEKKA",
-            6: "Golem",
-            7: "Mega Knight",
-            8: "Wizard",
-            9: "Dragon",
-            # Add more as we collect data
+            0: "Princess",
+            1: "Knight", 
+            2: "Goblin Gang",
+            3: "Ice Spirit",
+            4: "The Log",
+            5: "Goblin Barrel",
+            6: "Inferno Tower",
+            7: "Spear Goblin",
+            8: "Goblin",
+            9: "Archer"
         }
         
         # Reverse mapping for easy lookup
