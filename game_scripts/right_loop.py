@@ -21,6 +21,7 @@ def right_lane_target(viewport_px):
     vx, vy, vw, vh = viewport_px
     x = vx + int(0.72 * vw)
     y = vy + int(0.62 * vh)
+    y = y + 0
     return x, y
 #testing
 
