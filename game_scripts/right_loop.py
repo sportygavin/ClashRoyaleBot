@@ -26,7 +26,7 @@ def right_lane_target(viewport_px):
 #testing
 
 def main():
-    parser = argparse.ArgumentParser(description='Repeatedly place cards on right lane front.')
+    parser = argparse.ArgumentParser(description='Repeatedly place cards on front of the right lane.')
     parser.add_argument('--calib', default='cv_out/calibration_manual_fixed.json')
     parser.add_argument('--duration', type=int, default=180)
     parser.add_argument('--gap', type=float, default=1.0)
