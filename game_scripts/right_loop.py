@@ -74,3 +74,7 @@ if __name__ == '__main__':
 
 for i in range(1, 5):
     main(card=i)
+    if i == 4:
+        break
+    else:
+        time.sleep(1)
