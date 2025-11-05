@@ -78,3 +78,5 @@ for i in range(1, 5):
         break
     else:
         time.sleep(1)
+        print(f"Waiting for {i+1} seconds")
+        print(f"Playing card {i+1}")
