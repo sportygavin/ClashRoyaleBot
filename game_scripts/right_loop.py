@@ -70,13 +70,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-for i in range(1, 5):
-    main(card=i)
-    if i == 4:
-        break
-    else:
-        time.sleep(1)
-        print(f"Waiting for {i+1} seconds")
-        print(f"Playing card {i+1}")
