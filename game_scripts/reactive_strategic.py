@@ -152,7 +152,14 @@ class ReactiveStrategicBot:
     def update_strategy_mode(self, opponent_card: Optional[Dict]):
         """Update strategy mode based on opponent's play."""
         if opponent_card:
-            opponent_info = opponent_card.get('card_info', {})
+            opponent_info = opponent_card.get('card_info')
+            
+            # Check if we successfully identified the card
+            if opponent_info is None or not isinstance(opponent_info, dict):
+                # Card detected but not identified - use default strategy
+                print("⚠️ Opponent card detected but not identified")
+                return
+            
             opponent_type = opponent_info.get('type', '').lower()
             
             # Determine opponent's side (simplified - assume left/right based on position)

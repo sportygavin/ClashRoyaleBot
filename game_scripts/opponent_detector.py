@@ -132,7 +132,7 @@ class OpponentDetector:
             return {
                 'name': best_match,
                 'confidence': best_score,
-                'card_info': self.crs.database.get(best_match, {})
+                'card_info': self.crs.get_card_info(best_match) or {}
             }
         else:
             print("Could not identify opponent card")
