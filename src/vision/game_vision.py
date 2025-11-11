@@ -15,8 +15,19 @@ import pyautogui
 from typing import Dict, List, Tuple, Optional
 from PIL import Image
 import time
+import os
+import json
+from pathlib import Path
 from core import ComputerVisionSystem, GameState, GameInfo, Card
 from config import GAME_CONFIG
+
+# Try to import ultralytics for YOLO, but handle gracefully if not available
+try:
+    from ultralytics import YOLO
+    YOLO_AVAILABLE = True
+except ImportError:
+    YOLO_AVAILABLE = False
+    print("Warning: ultralytics not available. YOLO detection will be disabled.")
 
 class ClashRoyaleVision(ComputerVisionSystem):
     """Computer vision system for Clash Royale"""
@@ -35,8 +46,95 @@ class ClashRoyaleVision(ComputerVisionSystem):
         self.card_templates = {}
         self.ui_templates = {}
         
+        # YOLO model and configuration
+        self.yolo_model = None
+        self.yolo_available = False
+        self.card_classes = {}  # Map class ID to card name
+        self.card_database = {}  # Card database for costs
+        
+        # Load YOLO model if available
+        self._load_yolo_model()
+        
+        # Load card database
+        self._load_card_database()
+        
         # Load templates
         self._load_templates()
+    
+    def _load_yolo_model(self):
+        """Load YOLO model for card detection"""
+        if not YOLO_AVAILABLE:
+            print("YOLO not available - using fallback detection methods")
+            return
+        
+        model_path = Path('yolo_training/clash_royale_cards/weights/best.pt')
+        
+        if not model_path.exists():
+            print(f"Warning: YOLO model not found at {model_path}")
+            print("Card detection will use fallback methods")
+            return
+        
+        try:
+            self.yolo_model = YOLO(str(model_path))
+            self.yolo_available = True
+            
+            # Define card class mapping based on dataset.yaml
+            # These match the classes in yolo_data/dataset.yaml
+            self.card_classes = {
+                0: "Princess",
+                1: "Knight",
+                2: "Goblin Gang",
+                3: "Ice Spirit",
+                4: "The Log",
+                5: "Goblin Barrel",
+                6: "Inferno Tower",
+                7: "Spear Goblin",
+                8: "Goblin",
+                9: "Archer"
+            }
+            
+            print(f"✅ YOLO model loaded successfully from {model_path}")
+            print(f"✅ Card classes: {len(self.card_classes)}")
+            
+        except Exception as e:
+            print(f"Error loading YOLO model: {e}")
+            print("Card detection will use fallback methods")
+            self.yolo_available = False
+    
+    def _load_card_database(self):
+        """Load card database for elixir costs and other info"""
+        db_path = Path('database/clash_royale_cards.json')
+        
+        if not db_path.exists():
+            print(f"Warning: Card database not found at {db_path}")
+            return
+        
+        try:
+            with open(db_path, 'r') as f:
+                data = json.load(f)
+                self.card_database = data.get('cards', {})
+            print(f"✅ Card database loaded: {len(self.card_database)} cards")
+        except Exception as e:
+            print(f"Error loading card database: {e}")
+    
+    def _get_card_cost(self, card_name: str) -> int:
+        """Get elixir cost for a card from database"""
+        if not self.card_database:
+            return 3  # Default cost
+        
+        # Try exact match first
+        for card_id, card_data in self.card_database.items():
+            if card_data.get('name', '').lower() == card_name.lower():
+                return card_data.get('elixir_cost', 3)
+        
+        # Try partial match (e.g., "Goblin" matches "Goblins")
+        card_name_lower = card_name.lower()
+        for card_id, card_data in self.card_database.items():
+            db_name = card_data.get('name', '').lower()
+            if card_name_lower in db_name or db_name in card_name_lower:
+                return card_data.get('elixir_cost', 3)
+        
+        return 3  # Default cost if not found
     
     def _load_templates(self):
         """Load image templates for recognition"""
@@ -184,6 +282,9 @@ class ClashRoyaleVision(ComputerVisionSystem):
         arena_troops = self._extract_arena_troops(screen)
         time_remaining = self._extract_match_time(gray)
         
+        # Detect opponent cards using YOLO
+        opponent_cards = self.detect_opponent_cards(screen)
+        
         return GameInfo(
             state=GameState.IN_GAME,
             player_elixir=player_elixir,
@@ -191,7 +292,7 @@ class ClashRoyaleVision(ComputerVisionSystem):
             player_towers=player_towers,
             opponent_towers=opponent_towers,
             player_cards=player_cards,
-            opponent_cards=[],  # Placeholder - opponent cards harder to detect
+            opponent_cards=opponent_cards,
             time_remaining=time_remaining,
             arena_troops=arena_troops
         )
@@ -206,7 +307,95 @@ class ClashRoyaleVision(ComputerVisionSystem):
         return 10.0  # Placeholder
     
     def _extract_player_cards(self, screen: np.ndarray) -> List[Card]:
-        """Extract player's available cards"""
+        """Extract player's available cards using YOLO detection"""
+        if not self.yolo_available or self.yolo_model is None:
+            # Fallback to original method if YOLO not available
+            return self._extract_player_cards_fallback(screen)
+        
+        cards = []
+        height, width = screen.shape[:2]
+        
+        # Extract card hand region (bottom 15% of screen)
+        card_region_y1 = int(height * 0.85)
+        card_region_y2 = height
+        card_region = screen[card_region_y1:card_region_y2, :]
+        
+        if card_region.size == 0:
+            return cards
+        
+        # Run YOLO inference on card hand region
+        confidence_threshold = 0.3
+        try:
+            results = self.yolo_model(card_region, conf=confidence_threshold, iou=0.45, verbose=False)
+            
+            # Process detections
+            detected_cards = []
+            for result in results:
+                boxes = result.boxes
+                if boxes is not None and len(boxes) > 0:
+                    for box in boxes:
+                        # Get bounding box coordinates (relative to card_region)
+                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                        confidence = float(box.conf[0].cpu().numpy())
+                        class_id = int(box.cls[0].cpu().numpy())
+                        
+                        # Convert to absolute screen coordinates
+                        abs_x1 = int(x1)
+                        abs_y1 = int(y1) + card_region_y1
+                        abs_x2 = int(x2)
+                        abs_y2 = int(y2) + card_region_y1
+                        
+                        # Get card name from class ID
+                        card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
+                        
+                        # Calculate center position
+                        center_x = (abs_x1 + abs_x2) // 2
+                        center_y = (abs_y1 + abs_y2) // 2
+                        pos = (center_x, center_y)
+                        
+                        # Get card cost from database
+                        card_cost = self._get_card_cost(card_name)
+                        
+                        # Check if card is available (not grayed out)
+                        card_bbox = screen[abs_y1:abs_y2, abs_x1:abs_x2]
+                        is_available = self._is_card_available(card_bbox) if card_bbox.size > 0 else True
+                        
+                        detected_cards.append({
+                            'name': card_name,
+                            'cost': card_cost,
+                            'position': pos,
+                            'is_available': is_available,
+                            'confidence': confidence,
+                            'bbox': (abs_x1, abs_y1, abs_x2, abs_y2)
+                        })
+            
+            # Sort by x position (left to right) and take top 4
+            detected_cards.sort(key=lambda c: c['position'][0])
+            detected_cards = detected_cards[:4]
+            
+            # Convert to Card objects
+            for card_data in detected_cards:
+                cards.append(Card(
+                    name=card_data['name'],
+                    cost=card_data['cost'],
+                    position=card_data['position'],
+                    is_available=card_data['is_available'],
+                    cooldown_remaining=0.0
+                ))
+            
+        except Exception as e:
+            print(f"Error in YOLO card detection: {e}")
+            # Fallback to original method on error
+            return self._extract_player_cards_fallback(screen)
+        
+        # If no cards detected, fallback to original method
+        if len(cards) == 0:
+            return self._extract_player_cards_fallback(screen)
+        
+        return cards
+    
+    def _extract_player_cards_fallback(self, screen: np.ndarray) -> List[Card]:
+        """Fallback method for extracting player cards (original implementation)"""
         cards = []
         height, width = screen.shape[:2]
         
@@ -255,11 +444,119 @@ class ClashRoyaleVision(ComputerVisionSystem):
             "right_tower": 1400
         }
     
+    def detect_opponent_cards(self, screen: np.ndarray) -> List[Card]:
+        """Detect opponent cards in the arena using YOLO"""
+        if not self.yolo_available or self.yolo_model is None:
+            return []
+        
+        cards = []
+        height, width = screen.shape[:2]
+        
+        # Extract opponent region (top half of screen, excluding very top UI)
+        opponent_region_y1 = int(height * 0.10)  # Start below UI
+        opponent_region_y2 = int(height * 0.50)  # Top half
+        opponent_region = screen[opponent_region_y1:opponent_region_y2, :]
+        
+        if opponent_region.size == 0:
+            return cards
+        
+        # Run YOLO inference on opponent region
+        confidence_threshold = 0.3
+        try:
+            results = self.yolo_model(opponent_region, conf=confidence_threshold, iou=0.45, verbose=False)
+            
+            # Process detections
+            for result in results:
+                boxes = result.boxes
+                if boxes is not None and len(boxes) > 0:
+                    for box in boxes:
+                        # Get bounding box coordinates (relative to opponent_region)
+                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                        confidence = float(box.conf[0].cpu().numpy())
+                        class_id = int(box.cls[0].cpu().numpy())
+                        
+                        # Convert to absolute screen coordinates
+                        abs_x1 = int(x1)
+                        abs_y1 = int(y1) + opponent_region_y1
+                        abs_x2 = int(x2)
+                        abs_y2 = int(y2) + opponent_region_y1
+                        
+                        # Get card name from class ID
+                        card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
+                        
+                        # Calculate center position
+                        center_x = (abs_x1 + abs_x2) // 2
+                        center_y = (abs_y1 + abs_y2) // 2
+                        pos = (center_x, center_y)
+                        
+                        # Get card cost from database
+                        card_cost = self._get_card_cost(card_name)
+                        
+                        cards.append(Card(
+                            name=card_name,
+                            cost=card_cost,
+                            position=pos,
+                            is_available=True,  # Opponent cards are always "available" (visible)
+                            cooldown_remaining=0.0
+                        ))
+            
+        except Exception as e:
+            print(f"Error in YOLO opponent detection: {e}")
+            return []
+        
+        return cards
+    
     def _extract_arena_troops(self, screen: np.ndarray) -> List[Dict]:
         """Extract troops currently on arena"""
-        # This would use object detection/recognition
-        # For now, return empty list
-        return []
+        # Use YOLO to detect cards in arena (both player and opponent)
+        arena_troops = []
+        
+        if not self.yolo_available or self.yolo_model is None:
+            return arena_troops
+        
+        height, width = screen.shape[:2]
+        
+        # Extract arena region (middle area, excluding hand and top UI)
+        arena_region_y1 = int(height * 0.10)
+        arena_region_y2 = int(height * 0.85)
+        arena_region = screen[arena_region_y1:arena_region_y2, :]
+        
+        if arena_region.size == 0:
+            return arena_troops
+        
+        # Run YOLO inference
+        confidence_threshold = 0.3
+        try:
+            results = self.yolo_model(arena_region, conf=confidence_threshold, iou=0.45, verbose=False)
+            
+            for result in results:
+                boxes = result.boxes
+                if boxes is not None and len(boxes) > 0:
+                    for box in boxes:
+                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
+                        confidence = float(box.conf[0].cpu().numpy())
+                        class_id = int(box.cls[0].cpu().numpy())
+                        
+                        # Convert to absolute coordinates
+                        abs_x1 = int(x1)
+                        abs_y1 = int(y1) + arena_region_y1
+                        abs_x2 = int(x2)
+                        abs_y2 = int(y2) + arena_region_y1
+                        
+                        card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
+                        
+                        arena_troops.append({
+                            'name': card_name,
+                            'bbox': [abs_x1, abs_y1, abs_x2, abs_y2],
+                            'confidence': confidence,
+                            'position': ((abs_x1 + abs_x2) // 2, (abs_y1 + abs_y2) // 2)
+                        })
+            
+        except Exception as e:
+            print(f"Error in YOLO arena detection: {e}")
+            return []
+        
+        return arena_troops
     
     def _extract_match_time(self, gray_screen: np.ndarray) -> int:
         """Extract remaining match time"""
