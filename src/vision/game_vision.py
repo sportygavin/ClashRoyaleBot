@@ -103,17 +103,32 @@ class ClashRoyaleVision(ComputerVisionSystem):
     
     def _load_card_database(self):
         """Load card database for elixir costs and other info"""
-        db_path = Path('database/clash_royale_cards.json')
+        # Try new database first, fallback to old one
+        db_path = Path('data/cards_database.json')
         
         if not db_path.exists():
-            print(f"Warning: Card database not found at {db_path}")
-            return
+            # Fallback to old database location
+            db_path = Path('database/clash_royale_cards.json')
+            if not db_path.exists():
+                print(f"Warning: Card database not found at {db_path}")
+                return
         
         try:
             with open(db_path, 'r') as f:
                 data = json.load(f)
-                self.card_database = data.get('cards', {})
-            print(f"✅ Card database loaded: {len(self.card_database)} cards")
+                
+                # Handle both array format (new) and dict format (old)
+                if isinstance(data, list):
+                    # New format: array of card objects
+                    self.card_database = {card.get('key', card.get('name', '').lower()): card for card in data}
+                elif isinstance(data, dict) and 'cards' in data:
+                    # Old format: dict with 'cards' key
+                    self.card_database = data.get('cards', {})
+                else:
+                    # Old format: direct dict
+                    self.card_database = data
+                    
+            print(f"✅ Card database loaded: {len(self.card_database)} cards from {db_path}")
         except Exception as e:
             print(f"Error loading card database: {e}")
     
@@ -122,17 +137,25 @@ class ClashRoyaleVision(ComputerVisionSystem):
         if not self.card_database:
             return 3  # Default cost
         
-        # Try exact match first
-        for card_id, card_data in self.card_database.items():
-            if card_data.get('name', '').lower() == card_name.lower():
-                return card_data.get('elixir_cost', 3)
+        card_name_lower = card_name.lower()
+        
+        # Try exact match first (by name)
+        for card_key, card_data in self.card_database.items():
+            db_name = card_data.get('name', '').lower()
+            if db_name == card_name_lower:
+                # New format uses 'elixir', old format uses 'elixir_cost'
+                return card_data.get('elixir', card_data.get('elixir_cost', 3))
+        
+        # Try match by key
+        if card_name_lower in self.card_database:
+            card_data = self.card_database[card_name_lower]
+            return card_data.get('elixir', card_data.get('elixir_cost', 3))
         
         # Try partial match (e.g., "Goblin" matches "Goblins")
-        card_name_lower = card_name.lower()
-        for card_id, card_data in self.card_database.items():
+        for card_key, card_data in self.card_database.items():
             db_name = card_data.get('name', '').lower()
             if card_name_lower in db_name or db_name in card_name_lower:
-                return card_data.get('elixir_cost', 3)
+                return card_data.get('elixir', card_data.get('elixir_cost', 3))
         
         return 3  # Default cost if not found
     
