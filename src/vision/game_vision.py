@@ -68,10 +68,18 @@ class ClashRoyaleVision(ComputerVisionSystem):
         self._load_templates()
     
     def _load_calibration(self):
-        """Load calibration data for viewport extraction"""
-        calib_path = Path(self.calibration_path)
+        """Load calibration data for viewport extraction - same pattern as strategy_utils.default_viewport()"""
+        # Resolve path relative to project root if needed
+        if not os.path.isabs(self.calibration_path):
+            # Get project root (parent of src directory)
+            project_root = Path(__file__).parent.parent.parent
+            calib_path = project_root / self.calibration_path
+        else:
+            calib_path = Path(self.calibration_path)
+        
         if not calib_path.exists():
             print(f"Warning: Calibration file not found at {calib_path}")
+            print(f"  (resolved from: {self.calibration_path})")
             print("Using default screen capture method")
             return
         
@@ -79,21 +87,22 @@ class ClashRoyaleVision(ComputerVisionSystem):
             with open(calib_path, 'r') as f:
                 self.calibration = json.load(f)
             
-            # Calculate viewport in absolute coordinates
+            # Calculate viewport in absolute coordinates - same as default_viewport() in strategy_utils
             screen_w, screen_h = pyautogui.size()
-            viewport_r = self.calibration.get('viewport', {})
-            if viewport_r:
-                vx = int(viewport_r.get('x_r', 0) * screen_w)
-                vy = int(viewport_r.get('y_r', 0) * screen_h)
-                vw = int(viewport_r.get('w_r', 1.0) * screen_w)
-                vh = int(viewport_r.get('h_r', 1.0) * screen_h)
-                self.viewport = (vx, vy, vw, vh)
-                print(f"✅ Calibration loaded: viewport at ({vx}, {vy}) size {vw}x{vh}")
-            else:
-                print("Warning: No viewport in calibration file")
+            viewport_r = self.calibration.get('viewport') or {'x_r': 0.0, 'y_r': 0.0, 'w_r': 1.0, 'h_r': 1.0}
+            vx = int(viewport_r.get('x_r', 0) * screen_w)
+            vy = int(viewport_r.get('y_r', 0) * screen_h)
+            vw = int(viewport_r.get('w_r', 1.0) * screen_w)
+            vh = int(viewport_r.get('h_r', 1.0) * screen_h)
+            self.viewport = (vx, vy, vw, vh)
+            print(f"✅ Calibration loaded from {calib_path}")
+            print(f"   Viewport: ({vx}, {vy}) size {vw}x{vh} (screen: {screen_w}x{screen_h})")
         except Exception as e:
             print(f"Error loading calibration: {e}")
+            import traceback
+            traceback.print_exc()
             self.calibration = None
+            self.viewport = None
     
     def _load_yolo_model(self):
         """Load YOLO model for card detection"""
@@ -200,7 +209,7 @@ class ClashRoyaleVision(ComputerVisionSystem):
         pass
     
     def capture_screen(self) -> np.ndarray:
-        """Capture the full game screen (like screen_bgr)"""
+        """Capture the full game screen (like screen_bgr in strategy_utils)"""
         try:
             # Capture full screen - same as screen_bgr() in strategy_utils
             screenshot = pyautogui.screenshot()
@@ -223,6 +232,8 @@ class ClashRoyaleVision(ComputerVisionSystem):
             
         except Exception as e:
             print(f"Error capturing screen: {e}")
+            import traceback
+            traceback.print_exc()
             return None
     
     def detect_game_state(self, screen: np.ndarray) -> GameState:
@@ -345,26 +356,36 @@ class ClashRoyaleVision(ComputerVisionSystem):
             return self._extract_player_cards_fallback(screen)
         
         cards = []
-        height, width = screen.shape[:2]
+        screen_height, screen_width = screen.shape[:2]
         
-        # Extract card hand region using calibration viewport coordinates
-        # Coordinates are relative to FULL SCREEN, not viewport
-        if self.viewport is not None and self.calibration and 'card_row' in self.calibration:
-            vx, vy, vw, vh = self.viewport
-            card_row = self.calibration['card_row']
-            # Card row is relative to viewport, convert to full screen coordinates
-            card_region_y1 = vy + int(card_row.get('top_r', 0.85) * vh)
-            card_region_y2 = vy + int(card_row.get('bottom_r', 1.0) * vh)
-            card_region_x1 = vx
-            card_region_x2 = vx + vw
+        # Extract viewport from full screen first
+        if self.viewport is None:
+            # No viewport, use full screen
+            viewport_region = screen
+            vx, vy = 0, 0
         else:
-            # Fallback: bottom 15% of screen
-            card_region_y1 = int(height * 0.85)
-            card_region_y2 = height
-            card_region_x1 = 0
-            card_region_x2 = width
+            vx, vy, vw, vh = self.viewport
+            # Extract viewport region from full screen
+            viewport_region = screen[vy:vy+vh, vx:vx+vw]
+            vh_actual, vw_actual = viewport_region.shape[:2]
         
-        card_region = screen[card_region_y1:card_region_y2, card_region_x1:card_region_x2]
+        if viewport_region.size == 0:
+            return cards
+        
+        # Extract card hand region from viewport (card_row is relative to viewport)
+        if self.calibration and 'card_row' in self.calibration:
+            card_row = self.calibration['card_row']
+            # Card row coordinates are relative to viewport
+            vh_actual = viewport_region.shape[0]
+            card_region_y1_vp = int(card_row.get('top_r', 0.85) * vh_actual)
+            card_region_y2_vp = int(card_row.get('bottom_r', 1.0) * vh_actual)
+            card_region = viewport_region[card_region_y1_vp:card_region_y2_vp, :]
+        else:
+            # Fallback: bottom 15% of viewport
+            vh_actual = viewport_region.shape[0]
+            card_region_y1_vp = int(vh_actual * 0.85)
+            card_region_y2_vp = vh_actual
+            card_region = viewport_region[card_region_y1_vp:card_region_y2_vp, :]
         
         if card_region.size == 0:
             return cards
@@ -417,12 +438,19 @@ class ClashRoyaleVision(ComputerVisionSystem):
                             print(f"Error converting tensor: {e}")
                             continue
                         
-                        # Convert to absolute screen coordinates (full screen)
-                        # YOLO coordinates are relative to card_region, add offsets
-                        abs_x1 = int(x1) + card_region_x1
-                        abs_y1 = int(y1) + card_region_y1
-                        abs_x2 = int(x2) + card_region_x1
-                        abs_y2 = int(y2) + card_region_y1
+                        # Convert coordinates: card_region -> viewport -> full screen
+                        # YOLO coordinates are relative to card_region
+                        # Add card_region offset to get viewport coordinates
+                        x1_vp = int(x1)  # card_region starts at x=0 in viewport
+                        y1_vp = int(y1) + card_region_y1_vp
+                        x2_vp = int(x2)
+                        y2_vp = int(y2) + card_region_y1_vp
+                        
+                        # Convert viewport coordinates to full screen coordinates
+                        abs_x1 = x1_vp + vx
+                        abs_y1 = y1_vp + vy
+                        abs_x2 = x2_vp + vx
+                        abs_y2 = y2_vp + vy
                         
                         # Get card name from class ID
                         card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
@@ -529,25 +557,42 @@ class ClashRoyaleVision(ComputerVisionSystem):
             return []
         
         cards = []
-        height, width = screen.shape[:2]
+        screen_height, screen_width = screen.shape[:2]
         
-        # Extract opponent region using calibration viewport coordinates
-        # Coordinates are relative to FULL SCREEN, not viewport
-        opponent_region_x1 = 0  # Initialize for coordinate conversion
-        if self.viewport is not None and self.calibration and 'opponent_region_roi' in self.calibration:
-            vx, vy, vw, vh = self.viewport
-            opp_roi = self.calibration['opponent_region_roi']
-            # Opponent region ROI is relative to viewport, convert to full screen coordinates
-            opponent_region_x1 = vx + int(opp_roi.get('x_r', 0) * vw)
-            opponent_region_y1 = vy + int(opp_roi.get('y_r', 0.22) * vh)
-            opponent_region_x2 = vx + int((opp_roi.get('x_r', 0) + opp_roi.get('w_r', 1.68)) * vw)
-            opponent_region_y2 = vy + int((opp_roi.get('y_r', 0) + opp_roi.get('h_r', 0.69)) * vh)
-            opponent_region = screen[opponent_region_y1:opponent_region_y2, opponent_region_x1:opponent_region_x2]
+        # Extract viewport from full screen first
+        if self.viewport is None:
+            viewport_region = screen
+            vx, vy = 0, 0
+            vh_actual, vw_actual = screen_height, screen_width
         else:
-            # Fallback: top half of screen, excluding very top UI
-            opponent_region_y1 = int(height * 0.10)
-            opponent_region_y2 = int(height * 0.50)
-            opponent_region = screen[opponent_region_y1:opponent_region_y2, :]
+            vx, vy, vw, vh = self.viewport
+            viewport_region = screen[vy:vy+vh, vx:vx+vw]
+            vh_actual, vw_actual = viewport_region.shape[:2]
+        
+        if viewport_region.size == 0:
+            return cards
+        
+        # Extract opponent region from viewport (opponent_region_roi is relative to viewport)
+        if self.calibration and 'opponent_region_roi' in self.calibration:
+            opp_roi = self.calibration['opponent_region_roi']
+            # Opponent region ROI is relative to viewport
+            opponent_region_x1_vp = int(opp_roi.get('x_r', 0.78) * vw_actual)
+            opponent_region_y1_vp = int(opp_roi.get('y_r', 0.22) * vh_actual)
+            opponent_region_x2_vp = int((opp_roi.get('x_r', 0.78) + opp_roi.get('w_r', 1.68)) * vw_actual)
+            opponent_region_y2_vp = int((opp_roi.get('y_r', 0.22) + opp_roi.get('h_r', 0.69)) * vh_actual)
+            # Clamp to viewport bounds
+            opponent_region_x1_vp = max(0, min(opponent_region_x1_vp, vw_actual))
+            opponent_region_y1_vp = max(0, min(opponent_region_y1_vp, vh_actual))
+            opponent_region_x2_vp = max(0, min(opponent_region_x2_vp, vw_actual))
+            opponent_region_y2_vp = max(0, min(opponent_region_y2_vp, vh_actual))
+            opponent_region = viewport_region[opponent_region_y1_vp:opponent_region_y2_vp, opponent_region_x1_vp:opponent_region_x2_vp]
+        else:
+            # Fallback: top half of viewport
+            opponent_region_y1_vp = int(vh_actual * 0.10)
+            opponent_region_y2_vp = int(vh_actual * 0.50)
+            opponent_region_x1_vp = 0
+            opponent_region_x2_vp = vw_actual
+            opponent_region = viewport_region[opponent_region_y1_vp:opponent_region_y2_vp, :]
         
         if opponent_region.size == 0:
             return cards
@@ -599,18 +644,18 @@ class ClashRoyaleVision(ComputerVisionSystem):
                             print(f"Error converting tensor: {e}")
                             continue
                         
-                        # Convert to absolute screen coordinates
-                        if self.calibration and 'opponent_region_roi' in self.calibration:
-                            # Coordinates are relative to opponent_region, need to add offset
-                            abs_x1 = int(x1) + opponent_region_x1
-                            abs_y1 = int(y1) + opponent_region_y1
-                            abs_x2 = int(x2) + opponent_region_x1
-                            abs_y2 = int(y2) + opponent_region_y1
-                        else:
-                            abs_x1 = int(x1)
-                            abs_y1 = int(y1) + opponent_region_y1
-                            abs_x2 = int(x2)
-                            abs_y2 = int(y2) + opponent_region_y1
+                        # Convert coordinates: opponent_region -> viewport -> full screen
+                        # YOLO coordinates are relative to opponent_region
+                        x1_vp = int(x1) + opponent_region_x1_vp
+                        y1_vp = int(y1) + opponent_region_y1_vp
+                        x2_vp = int(x2) + opponent_region_x1_vp
+                        y2_vp = int(y2) + opponent_region_y1_vp
+                        
+                        # Convert viewport coordinates to full screen coordinates
+                        abs_x1 = x1_vp + vx
+                        abs_y1 = y1_vp + vy
+                        abs_x2 = x2_vp + vx
+                        abs_y2 = y2_vp + vy
                         
                         # Get card name from class ID
                         card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
@@ -645,29 +690,33 @@ class ClashRoyaleVision(ComputerVisionSystem):
         if not self.yolo_available or self.yolo_model is None:
             return arena_troops
         
-        height, width = screen.shape[:2]
+        screen_height, screen_width = screen.shape[:2]
         
-        # Extract arena region using viewport if available
-        if self.viewport is not None:
-            vx, vy, vw, vh = self.viewport
-            # Arena is the viewport area, excluding card row
-            if self.calibration and 'card_row' in self.calibration:
-                card_row = self.calibration['card_row']
-                arena_region_y1 = vy
-                arena_region_y2 = vy + int(card_row.get('top_r', 0.85) * vh)
-            else:
-                arena_region_y1 = vy
-                arena_region_y2 = vy + int(0.85 * vh)
-            arena_region_x1 = vx
-            arena_region_x2 = vx + vw
+        # Extract viewport from full screen first
+        if self.viewport is None:
+            viewport_region = screen
+            vx, vy = 0, 0
+            vh_actual, vw_actual = screen_height, screen_width
         else:
-            # Fallback: middle area, excluding hand and top UI
-            arena_region_y1 = int(height * 0.10)
-            arena_region_y2 = int(height * 0.85)
-            arena_region_x1 = 0
-            arena_region_x2 = width
+            vx, vy, vw, vh = self.viewport
+            viewport_region = screen[vy:vy+vh, vx:vx+vw]
+            vh_actual, vw_actual = viewport_region.shape[:2]
         
-        arena_region = screen[arena_region_y1:arena_region_y2, arena_region_x1:arena_region_x2]
+        if viewport_region.size == 0:
+            return arena_troops
+        
+        # Extract arena region from viewport (excluding card row)
+        if self.calibration and 'card_row' in self.calibration:
+            card_row = self.calibration['card_row']
+            arena_region_y1_vp = 0
+            arena_region_y2_vp = int(card_row.get('top_r', 0.85) * vh_actual)
+        else:
+            arena_region_y1_vp = 0
+            arena_region_y2_vp = int(0.85 * vh_actual)
+        arena_region_x1_vp = 0
+        arena_region_x2_vp = vw_actual
+        
+        arena_region = viewport_region[arena_region_y1_vp:arena_region_y2_vp, arena_region_x1_vp:arena_region_x2_vp]
         
         if arena_region.size == 0:
             return arena_troops
@@ -717,12 +766,18 @@ class ClashRoyaleVision(ComputerVisionSystem):
                             print(f"Error converting tensor: {e}")
                             continue
                         
-                        # Convert to absolute coordinates (full screen)
-                        # YOLO coordinates are relative to arena_region, add offsets
-                        abs_x1 = int(x1) + arena_region_x1
-                        abs_y1 = int(y1) + arena_region_y1
-                        abs_x2 = int(x2) + arena_region_x1
-                        abs_y2 = int(y2) + arena_region_y1
+                        # Convert coordinates: arena_region -> viewport -> full screen
+                        # YOLO coordinates are relative to arena_region
+                        x1_vp = int(x1) + arena_region_x1_vp
+                        y1_vp = int(y1) + arena_region_y1_vp
+                        x2_vp = int(x2) + arena_region_x1_vp
+                        y2_vp = int(y2) + arena_region_y1_vp
+                        
+                        # Convert viewport coordinates to full screen coordinates
+                        abs_x1 = x1_vp + vx
+                        abs_y1 = y1_vp + vy
+                        abs_x2 = x2_vp + vx
+                        abs_y2 = y2_vp + vy
                         
                         card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
                         

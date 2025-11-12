@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 import pyautogui
 import time
+import os
 
 class CardRecognitionSystem:
     def __init__(self, 
@@ -40,8 +41,20 @@ class CardRecognitionSystem:
             print(f"✅ Digit Templates: {len(self.digit_templates)} loaded")
     
     def _load_calibration(self, calibration_file):
-        """Load calibration data."""
-        with open(calibration_file) as f:
+        """Load calibration data, resolving relative paths from project root."""
+        # If path is relative, resolve it relative to project root
+        if not os.path.isabs(calibration_file):
+            # Get project root (parent of tools directory)
+            project_root = Path(__file__).parent.parent
+            calib_path = project_root / calibration_file
+        else:
+            calib_path = Path(calibration_file)
+        
+        # Check if file exists
+        if not calib_path.exists():
+            raise FileNotFoundError(f"Calibration file not found: {calib_path} (resolved from: {calibration_file})")
+        
+        with open(calib_path) as f:
             return json.load(f)
     
     def _load_database(self, database_file):

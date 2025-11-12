@@ -16,7 +16,18 @@ from tools.card_recognition_system import CardRecognitionSystem
 
 
 def load_calibration(path: str) -> dict:
-    with open(path, 'r') as f:
+    """Load calibration file, resolving relative paths from project root"""
+    # If path is relative, resolve it relative to project root
+    if not os.path.isabs(path):
+        calib_path = os.path.join(PROJECT_ROOT, path)
+    else:
+        calib_path = path
+    
+    # Check if file exists
+    if not os.path.exists(calib_path):
+        raise FileNotFoundError(f"Calibration file not found: {calib_path} (resolved from: {path})")
+    
+    with open(calib_path, 'r') as f:
         return json.load(f)
 
 
