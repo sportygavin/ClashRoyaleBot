@@ -32,7 +32,7 @@ except ImportError:
 class ClashRoyaleVision(ComputerVisionSystem):
     """Computer vision system for Clash Royale"""
     
-    def __init__(self):
+    def __init__(self, calibration_path: str = "cv_out/calibration_manual_fixed.json"):
         # Get platform-specific configuration
         platform = GAME_CONFIG["platform"]
         platform_config = GAME_CONFIG.get(platform, GAME_CONFIG["ios_simulator"])
@@ -41,6 +41,12 @@ class ClashRoyaleVision(ComputerVisionSystem):
         self.card_positions = GAME_CONFIG["card_slots"]["positions"]
         self.elixir_position = GAME_CONFIG["elixir_bar"]["position"]
         self.platform = platform
+        
+        # Load calibration data
+        self.calibration_path = calibration_path
+        self.calibration = None
+        self.viewport = None
+        self._load_calibration()
         
         # Template matching templates (will be loaded from files)
         self.card_templates = {}
@@ -60,6 +66,34 @@ class ClashRoyaleVision(ComputerVisionSystem):
         
         # Load templates
         self._load_templates()
+    
+    def _load_calibration(self):
+        """Load calibration data for viewport extraction"""
+        calib_path = Path(self.calibration_path)
+        if not calib_path.exists():
+            print(f"Warning: Calibration file not found at {calib_path}")
+            print("Using default screen capture method")
+            return
+        
+        try:
+            with open(calib_path, 'r') as f:
+                self.calibration = json.load(f)
+            
+            # Calculate viewport in absolute coordinates
+            screen_w, screen_h = pyautogui.size()
+            viewport_r = self.calibration.get('viewport', {})
+            if viewport_r:
+                vx = int(viewport_r.get('x_r', 0) * screen_w)
+                vy = int(viewport_r.get('y_r', 0) * screen_h)
+                vw = int(viewport_r.get('w_r', 1.0) * screen_w)
+                vh = int(viewport_r.get('h_r', 1.0) * screen_h)
+                self.viewport = (vx, vy, vw, vh)
+                print(f"✅ Calibration loaded: viewport at ({vx}, {vy}) size {vw}x{vh}")
+            else:
+                print("Warning: No viewport in calibration file")
+        except Exception as e:
+            print(f"Error loading calibration: {e}")
+            self.calibration = None
     
     def _load_yolo_model(self):
         """Load YOLO model for card detection"""
@@ -166,48 +200,23 @@ class ClashRoyaleVision(ComputerVisionSystem):
         pass
     
     def capture_screen(self) -> np.ndarray:
-        """Capture the game screen with proper aspect ratio"""
+        """Capture the full game screen (like screen_bgr)"""
         try:
-            # First, capture the full screen to detect actual dimensions
-            full_screenshot = pyautogui.screenshot()
-            full_height, full_width = full_screenshot.size
-            
-            # Calculate proper game area that maintains aspect ratio
-            # BlueStacks typically uses 16:9 aspect ratio
-            target_aspect_ratio = 16 / 9
-            
-            # Calculate the maximum width we can use while maintaining aspect ratio
-            max_width = int(full_height * target_aspect_ratio)
-            
-            # If the calculated width is larger than screen width, use screen width
-            if max_width > full_width:
-                max_width = full_width
-                # Recalculate height to maintain aspect ratio
-                target_height = int(full_width / target_aspect_ratio)
-            else:
-                target_height = full_height
-            
-            # Center the game area on the screen
-            x_offset = (full_width - max_width) // 2
-            y_offset = (full_height - target_height) // 2
-            
-            # Capture the centered game area
-            screenshot = pyautogui.screenshot(region=(
-                x_offset,
-                y_offset,
-                max_width,
-                target_height
-            ))
+            # Capture full screen - same as screen_bgr() in strategy_utils
+            screenshot = pyautogui.screenshot()
+            if screenshot is None:
+                return None
             
             # Convert to OpenCV format
             screen = cv2.cvtColor(np.array(screenshot), cv2.COLOR_RGB2BGR)
             
-            # Update game area for other methods
+            # Update game area to full screen dimensions
+            height, width = screen.shape[:2]
             self.game_area = {
-                "x": x_offset,
-                "y": y_offset,
-                "width": max_width,
-                "height": target_height
+                "x": 0,
+                "y": 0,
+                "width": width,
+                "height": height
             }
             
             return screen
@@ -338,10 +347,24 @@ class ClashRoyaleVision(ComputerVisionSystem):
         cards = []
         height, width = screen.shape[:2]
         
-        # Extract card hand region (bottom 15% of screen)
-        card_region_y1 = int(height * 0.85)
-        card_region_y2 = height
-        card_region = screen[card_region_y1:card_region_y2, :]
+        # Extract card hand region using calibration viewport coordinates
+        # Coordinates are relative to FULL SCREEN, not viewport
+        if self.viewport is not None and self.calibration and 'card_row' in self.calibration:
+            vx, vy, vw, vh = self.viewport
+            card_row = self.calibration['card_row']
+            # Card row is relative to viewport, convert to full screen coordinates
+            card_region_y1 = vy + int(card_row.get('top_r', 0.85) * vh)
+            card_region_y2 = vy + int(card_row.get('bottom_r', 1.0) * vh)
+            card_region_x1 = vx
+            card_region_x2 = vx + vw
+        else:
+            # Fallback: bottom 15% of screen
+            card_region_y1 = int(height * 0.85)
+            card_region_y2 = height
+            card_region_x1 = 0
+            card_region_x2 = width
+        
+        card_region = screen[card_region_y1:card_region_y2, card_region_x1:card_region_x2]
         
         if card_region.size == 0:
             return cards
@@ -358,14 +381,47 @@ class ClashRoyaleVision(ComputerVisionSystem):
                 if boxes is not None and len(boxes) > 0:
                     for box in boxes:
                         # Get bounding box coordinates (relative to card_region)
-                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                        confidence = float(box.conf[0].cpu().numpy())
-                        class_id = int(box.cls[0].cpu().numpy())
+                        # Convert tensors using tolist() which is more reliable
+                        try:
+                            xyxy = box.xyxy[0]
+                            if hasattr(xyxy, 'cpu'):
+                                xyxy = xyxy.cpu()
+                            if hasattr(xyxy, 'tolist'):
+                                xyxy_list = xyxy.tolist()
+                            elif hasattr(xyxy, 'numpy'):
+                                xyxy_list = xyxy.numpy().tolist()
+                            else:
+                                xyxy_list = list(xyxy)
+                            x1, y1, x2, y2 = xyxy_list
+                            
+                            conf = box.conf[0]
+                            if hasattr(conf, 'cpu'):
+                                conf = conf.cpu()
+                            if hasattr(conf, 'item'):
+                                confidence = float(conf.item())
+                            elif hasattr(conf, 'tolist'):
+                                confidence = float(conf.tolist())
+                            else:
+                                confidence = float(conf)
+                            
+                            cls = box.cls[0]
+                            if hasattr(cls, 'cpu'):
+                                cls = cls.cpu()
+                            if hasattr(cls, 'item'):
+                                class_id = int(cls.item())
+                            elif hasattr(cls, 'tolist'):
+                                class_id = int(cls.tolist())
+                            else:
+                                class_id = int(cls)
+                        except Exception as e:
+                            print(f"Error converting tensor: {e}")
+                            continue
                         
-                        # Convert to absolute screen coordinates
-                        abs_x1 = int(x1)
+                        # Convert to absolute screen coordinates (full screen)
+                        # YOLO coordinates are relative to card_region, add offsets
+                        abs_x1 = int(x1) + card_region_x1
                         abs_y1 = int(y1) + card_region_y1
-                        abs_x2 = int(x2)
+                        abs_x2 = int(x2) + card_region_x1
                         abs_y2 = int(y2) + card_region_y1
                         
                         # Get card name from class ID
@@ -475,10 +531,23 @@ class ClashRoyaleVision(ComputerVisionSystem):
         cards = []
         height, width = screen.shape[:2]
         
-        # Extract opponent region (top half of screen, excluding very top UI)
-        opponent_region_y1 = int(height * 0.10)  # Start below UI
-        opponent_region_y2 = int(height * 0.50)  # Top half
-        opponent_region = screen[opponent_region_y1:opponent_region_y2, :]
+        # Extract opponent region using calibration viewport coordinates
+        # Coordinates are relative to FULL SCREEN, not viewport
+        opponent_region_x1 = 0  # Initialize for coordinate conversion
+        if self.viewport is not None and self.calibration and 'opponent_region_roi' in self.calibration:
+            vx, vy, vw, vh = self.viewport
+            opp_roi = self.calibration['opponent_region_roi']
+            # Opponent region ROI is relative to viewport, convert to full screen coordinates
+            opponent_region_x1 = vx + int(opp_roi.get('x_r', 0) * vw)
+            opponent_region_y1 = vy + int(opp_roi.get('y_r', 0.22) * vh)
+            opponent_region_x2 = vx + int((opp_roi.get('x_r', 0) + opp_roi.get('w_r', 1.68)) * vw)
+            opponent_region_y2 = vy + int((opp_roi.get('y_r', 0) + opp_roi.get('h_r', 0.69)) * vh)
+            opponent_region = screen[opponent_region_y1:opponent_region_y2, opponent_region_x1:opponent_region_x2]
+        else:
+            # Fallback: top half of screen, excluding very top UI
+            opponent_region_y1 = int(height * 0.10)
+            opponent_region_y2 = int(height * 0.50)
+            opponent_region = screen[opponent_region_y1:opponent_region_y2, :]
         
         if opponent_region.size == 0:
             return cards
@@ -494,15 +563,54 @@ class ClashRoyaleVision(ComputerVisionSystem):
                 if boxes is not None and len(boxes) > 0:
                     for box in boxes:
                         # Get bounding box coordinates (relative to opponent_region)
-                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                        confidence = float(box.conf[0].cpu().numpy())
-                        class_id = int(box.cls[0].cpu().numpy())
+                        # Convert tensors using tolist() which is more reliable
+                        try:
+                            xyxy = box.xyxy[0]
+                            if hasattr(xyxy, 'cpu'):
+                                xyxy = xyxy.cpu()
+                            if hasattr(xyxy, 'tolist'):
+                                xyxy_list = xyxy.tolist()
+                            elif hasattr(xyxy, 'numpy'):
+                                xyxy_list = xyxy.numpy().tolist()
+                            else:
+                                xyxy_list = list(xyxy)
+                            x1, y1, x2, y2 = xyxy_list
+                            
+                            conf = box.conf[0]
+                            if hasattr(conf, 'cpu'):
+                                conf = conf.cpu()
+                            if hasattr(conf, 'item'):
+                                confidence = float(conf.item())
+                            elif hasattr(conf, 'tolist'):
+                                confidence = float(conf.tolist())
+                            else:
+                                confidence = float(conf)
+                            
+                            cls = box.cls[0]
+                            if hasattr(cls, 'cpu'):
+                                cls = cls.cpu()
+                            if hasattr(cls, 'item'):
+                                class_id = int(cls.item())
+                            elif hasattr(cls, 'tolist'):
+                                class_id = int(cls.tolist())
+                            else:
+                                class_id = int(cls)
+                        except Exception as e:
+                            print(f"Error converting tensor: {e}")
+                            continue
                         
                         # Convert to absolute screen coordinates
-                        abs_x1 = int(x1)
-                        abs_y1 = int(y1) + opponent_region_y1
-                        abs_x2 = int(x2)
-                        abs_y2 = int(y2) + opponent_region_y1
+                        if self.calibration and 'opponent_region_roi' in self.calibration:
+                            # Coordinates are relative to opponent_region, need to add offset
+                            abs_x1 = int(x1) + opponent_region_x1
+                            abs_y1 = int(y1) + opponent_region_y1
+                            abs_x2 = int(x2) + opponent_region_x1
+                            abs_y2 = int(y2) + opponent_region_y1
+                        else:
+                            abs_x1 = int(x1)
+                            abs_y1 = int(y1) + opponent_region_y1
+                            abs_x2 = int(x2)
+                            abs_y2 = int(y2) + opponent_region_y1
                         
                         # Get card name from class ID
                         card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
@@ -539,10 +647,27 @@ class ClashRoyaleVision(ComputerVisionSystem):
         
         height, width = screen.shape[:2]
         
-        # Extract arena region (middle area, excluding hand and top UI)
-        arena_region_y1 = int(height * 0.10)
-        arena_region_y2 = int(height * 0.85)
-        arena_region = screen[arena_region_y1:arena_region_y2, :]
+        # Extract arena region using viewport if available
+        if self.viewport is not None:
+            vx, vy, vw, vh = self.viewport
+            # Arena is the viewport area, excluding card row
+            if self.calibration and 'card_row' in self.calibration:
+                card_row = self.calibration['card_row']
+                arena_region_y1 = vy
+                arena_region_y2 = vy + int(card_row.get('top_r', 0.85) * vh)
+            else:
+                arena_region_y1 = vy
+                arena_region_y2 = vy + int(0.85 * vh)
+            arena_region_x1 = vx
+            arena_region_x2 = vx + vw
+        else:
+            # Fallback: middle area, excluding hand and top UI
+            arena_region_y1 = int(height * 0.10)
+            arena_region_y2 = int(height * 0.85)
+            arena_region_x1 = 0
+            arena_region_x2 = width
+        
+        arena_region = screen[arena_region_y1:arena_region_y2, arena_region_x1:arena_region_x2]
         
         if arena_region.size == 0:
             return arena_troops
@@ -556,14 +681,47 @@ class ClashRoyaleVision(ComputerVisionSystem):
                 boxes = result.boxes
                 if boxes is not None and len(boxes) > 0:
                     for box in boxes:
-                        x1, y1, x2, y2 = box.xyxy[0].cpu().numpy()
-                        confidence = float(box.conf[0].cpu().numpy())
-                        class_id = int(box.cls[0].cpu().numpy())
+                        # Convert tensors using tolist() which is more reliable
+                        try:
+                            xyxy = box.xyxy[0]
+                            if hasattr(xyxy, 'cpu'):
+                                xyxy = xyxy.cpu()
+                            if hasattr(xyxy, 'tolist'):
+                                xyxy_list = xyxy.tolist()
+                            elif hasattr(xyxy, 'numpy'):
+                                xyxy_list = xyxy.numpy().tolist()
+                            else:
+                                xyxy_list = list(xyxy)
+                            x1, y1, x2, y2 = xyxy_list
+                            
+                            conf = box.conf[0]
+                            if hasattr(conf, 'cpu'):
+                                conf = conf.cpu()
+                            if hasattr(conf, 'item'):
+                                confidence = float(conf.item())
+                            elif hasattr(conf, 'tolist'):
+                                confidence = float(conf.tolist())
+                            else:
+                                confidence = float(conf)
+                            
+                            cls = box.cls[0]
+                            if hasattr(cls, 'cpu'):
+                                cls = cls.cpu()
+                            if hasattr(cls, 'item'):
+                                class_id = int(cls.item())
+                            elif hasattr(cls, 'tolist'):
+                                class_id = int(cls.tolist())
+                            else:
+                                class_id = int(cls)
+                        except Exception as e:
+                            print(f"Error converting tensor: {e}")
+                            continue
                         
-                        # Convert to absolute coordinates
-                        abs_x1 = int(x1)
+                        # Convert to absolute coordinates (full screen)
+                        # YOLO coordinates are relative to arena_region, add offsets
+                        abs_x1 = int(x1) + arena_region_x1
                         abs_y1 = int(y1) + arena_region_y1
-                        abs_x2 = int(x2)
+                        abs_x2 = int(x2) + arena_region_x1
                         abs_y2 = int(y2) + arena_region_y1
                         
                         card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
