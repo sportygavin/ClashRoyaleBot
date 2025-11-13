@@ -32,7 +32,7 @@ except ImportError:
 class ClashRoyaleVision(ComputerVisionSystem):
     """Computer vision system for Clash Royale"""
     
-    def __init__(self, calibration_path: str = "cv_out/calibration_manual_fixed.json"):
+    def __init__(self, calibration_path: str = "cv_out/calibration.json"):
         # Get platform-specific configuration
         platform = GAME_CONFIG["platform"]
         platform_config = GAME_CONFIG.get(platform, GAME_CONFIG["ios_simulator"])
@@ -69,7 +69,7 @@ class ClashRoyaleVision(ComputerVisionSystem):
     
     def _load_calibration(self):
         """Load calibration data for viewport extraction - same pattern as strategy_utils.default_viewport()"""
-        # Resolve path relative to project root if needed
+        # Resolve path relative to project root if needed (same as strategy_utils.load_calibration)
         if not os.path.isabs(self.calibration_path):
             # Get project root (parent of src directory)
             project_root = Path(__file__).parent.parent.parent
@@ -87,13 +87,14 @@ class ClashRoyaleVision(ComputerVisionSystem):
             with open(calib_path, 'r') as f:
                 self.calibration = json.load(f)
             
-            # Calculate viewport in absolute coordinates - same as default_viewport() in strategy_utils
+            # Calculate viewport in absolute coordinates - EXACT same as default_viewport() in strategy_utils
             screen_w, screen_h = pyautogui.size()
             viewport_r = self.calibration.get('viewport') or {'x_r': 0.0, 'y_r': 0.0, 'w_r': 1.0, 'h_r': 1.0}
-            vx = int(viewport_r.get('x_r', 0) * screen_w)
-            vy = int(viewport_r.get('y_r', 0) * screen_h)
-            vw = int(viewport_r.get('w_r', 1.0) * screen_w)
-            vh = int(viewport_r.get('h_r', 1.0) * screen_h)
+            # Use same calculation as ratios_to_abs() in strategy_utils
+            vx = int(viewport_r['x_r'] * screen_w)
+            vy = int(viewport_r['y_r'] * screen_h)
+            vw = int(viewport_r['w_r'] * screen_w)
+            vh = int(viewport_r['h_r'] * screen_h)
             self.viewport = (vx, vy, vw, vh)
             print(f"✅ Calibration loaded from {calib_path}")
             print(f"   Viewport: ({vx}, {vy}) size {vw}x{vh} (screen: {screen_w}x{screen_h})")
