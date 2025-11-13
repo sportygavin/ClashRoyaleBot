@@ -32,7 +32,7 @@ except ImportError:
 class ClashRoyaleVision(ComputerVisionSystem):
     """Computer vision system for Clash Royale"""
     
-    def __init__(self, calibration_path: str = "cv_out/calibration.json"):
+    def __init__(self, calibration_path: str = "cv_out/calibration_manual_fixed.json"):
         # Get platform-specific configuration
         platform = GAME_CONFIG["platform"]
         platform_config = GAME_CONFIG.get(platform, GAME_CONFIG["ios_simulator"])
@@ -46,6 +46,7 @@ class ClashRoyaleVision(ComputerVisionSystem):
         self.calibration_path = calibration_path
         self.calibration = None
         self.viewport = None
+        self.actual_screen_size = None  # Store actual screenshot dimensions (for Retina displays)
         self._load_calibration()
         
         # Template matching templates (will be loaded from files)
@@ -68,7 +69,7 @@ class ClashRoyaleVision(ComputerVisionSystem):
         self._load_templates()
     
     def _load_calibration(self):
-        """Load calibration data for viewport extraction - same pattern as strategy_utils.default_viewport()"""
+        """Load calibration data for viewport extraction - uses ACTUAL screenshot dimensions, not pyautogui.size()"""
         # Resolve path relative to project root if needed (same as strategy_utils.load_calibration)
         if not os.path.isabs(self.calibration_path):
             # Get project root (parent of src directory)
@@ -87,23 +88,37 @@ class ClashRoyaleVision(ComputerVisionSystem):
             with open(calib_path, 'r') as f:
                 self.calibration = json.load(f)
             
-            # Calculate viewport in absolute coordinates - EXACT same as default_viewport() in strategy_utils
-            screen_w, screen_h = pyautogui.size()
+            # CRITICAL: Use actual screenshot dimensions, not pyautogui.size()
+            # On Retina displays, screenshot is 2x larger than pyautogui.size()
+            # This matches CardRecognitionSystem.extract_cards_from_screen() approach
+            screenshot = pyautogui.screenshot()
+            if screenshot:
+                actual_screen_w = screenshot.width
+                actual_screen_h = screenshot.height
+            else:
+                # Fallback to pyautogui.size() if screenshot fails
+                actual_screen_w, actual_screen_h = pyautogui.size()
+            
             viewport_r = self.calibration.get('viewport') or {'x_r': 0.0, 'y_r': 0.0, 'w_r': 1.0, 'h_r': 1.0}
-            # Use same calculation as ratios_to_abs() in strategy_utils
-            vx = int(viewport_r['x_r'] * screen_w)
-            vy = int(viewport_r['y_r'] * screen_h)
-            vw = int(viewport_r['w_r'] * screen_w)
-            vh = int(viewport_r['h_r'] * screen_h)
+            # Use actual screenshot dimensions (same as CardRecognitionSystem)
+            vx = int(viewport_r['x_r'] * actual_screen_w)
+            vy = int(viewport_r['y_r'] * actual_screen_h)
+            vw = int(viewport_r['w_r'] * actual_screen_w)
+            vh = int(viewport_r['h_r'] * actual_screen_h)
             self.viewport = (vx, vy, vw, vh)
+            self.actual_screen_size = (actual_screen_w, actual_screen_h)
             print(f"✅ Calibration loaded from {calib_path}")
-            print(f"   Viewport: ({vx}, {vy}) size {vw}x{vh} (screen: {screen_w}x{screen_h})")
+            print(f"   Viewport: ({vx}, {vy}) size {vw}x{vh} (actual screen: {actual_screen_w}x{actual_screen_h})")
+            pyautogui_size = pyautogui.size()
+            if actual_screen_w != pyautogui_size[0] or actual_screen_h != pyautogui_size[1]:
+                print(f"   Note: pyautogui.size() = {pyautogui_size[0]}x{pyautogui_size[1]} (Retina scaling detected)")
         except Exception as e:
             print(f"Error loading calibration: {e}")
             import traceback
             traceback.print_exc()
             self.calibration = None
             self.viewport = None
+            self.actual_screen_size = None
     
     def _load_yolo_model(self):
         """Load YOLO model for card detection"""
@@ -447,34 +462,58 @@ class ClashRoyaleVision(ComputerVisionSystem):
                         x2_vp = int(x2)
                         y2_vp = int(y2) + card_region_y1_vp
                         
-                        # Convert viewport coordinates to full screen coordinates
+                        # Convert viewport coordinates to full screen coordinates (screenshot space)
                         abs_x1 = x1_vp + vx
                         abs_y1 = y1_vp + vy
                         abs_x2 = x2_vp + vx
                         abs_y2 = y2_vp + vy
                         
+                        # CRITICAL: Convert from screenshot coordinates to pyautogui coordinates
+                        # On Retina displays, screenshot is 2x larger than pyautogui.size()
+                        # right_loop.py uses pyautogui.size() for coordinates, so we must match that
+                        pyautogui_w, pyautogui_h = pyautogui.size()
+                        if self.actual_screen_size:
+                            actual_w, actual_h = self.actual_screen_size
+                            scale_x = pyautogui_w / actual_w
+                            scale_y = pyautogui_h / actual_h
+                        else:
+                            scale_x = scale_y = 1.0
+                        
+                        # Convert to pyautogui coordinate space (same as right_loop.py uses)
+                        abs_x1_py = int(abs_x1 * scale_x)
+                        abs_y1_py = int(abs_y1 * scale_y)
+                        abs_x2_py = int(abs_x2 * scale_x)
+                        abs_y2_py = int(abs_y2 * scale_y)
+                        
                         # Get card name from class ID
                         card_name = self.card_classes.get(class_id, f"Unknown_{class_id}")
                         
-                        # Calculate center position
-                        center_x = (abs_x1 + abs_x2) // 2
-                        center_y = (abs_y1 + abs_y2) // 2
+                        # Calculate center position in pyautogui coordinate space
+                        center_x = (abs_x1_py + abs_x2_py) // 2
+                        center_y = (abs_y1_py + abs_y2_py) // 2
                         pos = (center_x, center_y)
+                        
+                        # Debug: Print conversion details (can be removed later)
+                        if len(detected_cards) < 1:  # Only print for first detection
+                            print(f"DEBUG YOLO conversion: screenshot=({abs_x1}, {abs_y1})-({abs_x2}, {abs_y2}), "
+                                  f"pyautogui=({abs_x1_py}, {abs_y1_py})-({abs_x2_py}, {abs_y2_py}), "
+                                  f"center={pos}, scale=({scale_x:.3f}, {scale_y:.3f})")
                         
                         # Get card cost from database
                         card_cost = self._get_card_cost(card_name)
                         
                         # Check if card is available (not grayed out)
+                        # Use screenshot coordinates for image extraction
                         card_bbox = screen[abs_y1:abs_y2, abs_x1:abs_x2]
                         is_available = self._is_card_available(card_bbox) if card_bbox.size > 0 else True
                         
                         detected_cards.append({
                             'name': card_name,
                             'cost': card_cost,
-                            'position': pos,
+                            'position': pos,  # This is in pyautogui coordinate space
                             'is_available': is_available,
                             'confidence': confidence,
-                            'bbox': (abs_x1, abs_y1, abs_x2, abs_y2)
+                            'bbox': (abs_x1, abs_y1, abs_x2, abs_y2)  # Screenshot space for image extraction
                         })
             
             # Sort by x position (left to right) and take top 4
@@ -503,33 +542,75 @@ class ClashRoyaleVision(ComputerVisionSystem):
         return cards
     
     def _extract_player_cards_fallback(self, screen: np.ndarray) -> List[Card]:
-        """Fallback method for extracting player cards (original implementation)"""
+        """Fallback method for extracting player cards - uses same coordinate system as right_loop.py"""
         cards = []
-        height, width = screen.shape[:2]
         
-        # Calculate card positions relative to the actual screen size
-        # 4 cards evenly distributed across the bottom 15% of the screen
-        card_y = int(height * 0.92)  # 92% down from top
-        card_spacing = width // 5  # Divide width into 5 sections (4 cards + margins)
+        # Use calibration-based positions (same as right_loop.py uses)
+        if self.calibration and self.viewport:
+            vx, vy, vw, vh = self.viewport
+            if 'cards' in self.calibration and 'centers_x_r' in self.calibration['cards']:
+                centers_x_r = self.calibration['cards']['centers_x_r']
+                card_row = self.calibration.get('card_row', {})
+                row_top_r = card_row.get('top_r', 0.85)
+                row_bottom_r = card_row.get('bottom_r', 1.0)
+                
+                row_top_y = vy + int(row_top_r * vh)
+                row_bottom_y = vy + int(row_bottom_r * vh)
+                row_h = max(row_bottom_y - row_top_y, 1)
+                top_offset_r = self.calibration['cards'].get('top_offset_r', 0.1)
+                bottom_offset_r = self.calibration['cards'].get('bottom_offset_r', 0.1)
+                card_top = row_top_y + int(top_offset_r * row_h)
+                card_bottom = row_bottom_y - int(bottom_offset_r * row_h)
+                cy = (card_top + card_bottom) // 2
+                
+                # Convert to pyautogui coordinate space
+                pyautogui_w, pyautogui_h = pyautogui.size()
+                if self.actual_screen_size:
+                    actual_w, actual_h = self.actual_screen_size
+                    scale_x = pyautogui_w / actual_w
+                    scale_y = pyautogui_h / actual_h
+                else:
+                    scale_x = scale_y = 1.0
+                
+                for i in range(min(4, len(centers_x_r))):
+                    cx_vp = int(centers_x_r[i] * vw)
+                    cx_screenshot = vx + cx_vp
+                    cx_py = int(cx_screenshot * scale_x)
+                    cy_py = int(cy * scale_y)
+                    pos = (cx_py, cy_py)
+                    
+                    # Extract card region (use screenshot coordinates)
+                    card_region = screen[card_top:card_bottom, cx_screenshot-50:cx_screenshot+50]
+                    
+                    # Detect if card is available (not grayed out)
+                    is_available = self._is_card_available(card_region) if card_region.size > 0 else True
+                    
+                    # Get card name and cost (placeholder)
+                    card_name = f"card_{i+1}"
+                    card_cost = 3  # Placeholder
+                    
+                    cards.append(Card(
+                        name=card_name,
+                        cost=card_cost,
+                        position=pos,
+                        is_available=is_available,
+                        cooldown_remaining=0.0
+                    ))
+                return cards
+        
+        # Fallback to old method if calibration not available
+        height, width = screen.shape[:2]
+        card_y = int(height * 0.92)
+        card_spacing = width // 5
         
         for i in range(4):
-            # Calculate x position for each card
             card_x = card_spacing + (i * card_spacing)
             pos = (card_x, card_y)
-            
-            # Extract card region
             card_region = screen[pos[1]-50:pos[1]+50, pos[0]-50:pos[0]+50]
-            
-            # Detect if card is available (not grayed out)
             is_available = self._is_card_available(card_region)
-            
-            # Get card name and cost (placeholder)
-            card_name = f"card_{i+1}"
-            card_cost = 3  # Placeholder
-            
             cards.append(Card(
-                name=card_name,
-                cost=card_cost,
+                name=f"card_{i+1}",
+                cost=3,
                 position=pos,
                 is_available=is_available,
                 cooldown_remaining=0.0

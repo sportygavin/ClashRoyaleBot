@@ -12,20 +12,20 @@ import pyautogui
 # Add project root to path
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from game_scripts.strategy_utils import screen_bgr, load_calibration, default_viewport
-from game_scripts.yolo_opponent_detector import YOLOv8OpponentDetector
-from tools.card_recognition_system import CardRecognitionSystem
+from game_scripts.strategy_utils import (
+    screen_bgr, load_calibration, default_viewport, 
+    get_card_center_xy, drag_card_to, stable_elixir
+)
+from src.vision.game_vision import ClashRoyaleVision
+from core import GameState
 
 
 class ReactiveClashRoyaleBot:
-    def __init__(self, calibration_path: str, model_path: str):
-        # Initialize YOLOv8 opponent detector
-        self.opponent_detector = YOLOv8OpponentDetector(calibration_path, model_path)
+    def __init__(self, calibration_path: str, model_path: str = None):
+        # Initialize ClashRoyaleVision (uses fixed coordinate system)
+        self.vision = ClashRoyaleVision(calibration_path=calibration_path)
         
-        # Initialize card recognition for our hand
-        self.card_system = CardRecognitionSystem(calibration_file=calibration_path)
-        
-        # Load calibration
+        # Load calibration for card placement
         self.calib = load_calibration(calibration_path)
         self.viewport = default_viewport(self.calib)
         
@@ -78,67 +78,80 @@ class ReactiveClashRoyaleBot:
         }
         
         print("Reactive Clash Royale Bot Initialized!")
-        print(f"Monitoring opponent region: {self.opponent_detector.opponent_region}")
+        print(f"Using ClashRoyaleVision with fixed coordinate system")
+        print(f"YOLO available: {self.vision.yolo_available}")
         print(f"Counter strategies loaded for {len(self.counter_strategies)} card types")
     
     def get_current_hand(self) -> List[Dict]:
-        """Get current cards in hand."""
+        """Get current cards in hand using ClashRoyaleVision."""
         try:
-            screenshot = screen_bgr()
-            if screenshot is None:
+            screen = self.vision.capture_screen()
+            if screen is None:
                 return []
             
-            # Check if screenshot is valid
-            if not hasattr(screenshot, 'shape') or len(screenshot.shape) != 3:
-                print(f"Invalid screenshot format: {type(screenshot)}")
+            # Extract game info (uses YOLO or fallback)
+            game_info = self.vision.extract_game_info(screen)
+            if game_info is None:
                 return []
-                
-            cards = self.card_system.extract_cards_from_screen(screenshot)
+            
+            # Convert Card objects to dict format
             recognized_cards = []
-            
-            for i, card_img in enumerate(cards):
-                if card_img is not None and hasattr(card_img, 'shape'):
-                    card_name, confidence = self.card_system.recognize_card_by_template(card_img)
-                    if card_name and confidence > 0.3:
-                        card_info = self.card_system.database.get(card_name, {})
-                        recognized_cards.append({
-                            'name': card_name,
-                            'confidence': confidence,
-                            'elixir_cost': card_info.get('elixir_cost', 0),
-                            'position': i
-                        })
+            for i, card in enumerate(game_info.player_cards):
+                recognized_cards.append({
+                    'name': card.name,
+                    'confidence': 1.0,  # YOLO confidence if available
+                    'elixir_cost': card.cost,
+                    'position': i,
+                    'is_available': card.is_available,
+                    'card_obj': card  # Keep reference to original Card object
+                })
             
             return recognized_cards
         except Exception as e:
             print(f"Error getting hand: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def get_current_elixir(self) -> int:
         """Get current elixir count."""
         try:
-            screenshot = screen_bgr()
-            if screenshot is None:
+            screen = self.vision.capture_screen()
+            if screen is None:
                 return 0
-            elixir = self.card_system.recognize_current_elixir(screenshot)
-            # Handle tuple return (elixir, confidence)
-            if isinstance(elixir, tuple):
-                elixir = elixir[0]
-            return int(elixir) if elixir is not None else 0
+            game_info = self.vision.extract_game_info(screen)
+            if game_info:
+                return int(game_info.current_elixir) if game_info.current_elixir else 0
+            return 0
         except Exception as e:
             print(f"Error getting elixir: {e}")
             return 0
     
     def detect_opponent_cards(self) -> List[Dict]:
-        """Detect opponent cards using YOLOv8."""
+        """Detect opponent cards using ClashRoyaleVision."""
         try:
-            frame = screen_bgr()
-            if frame is None:
+            screen = self.vision.capture_screen()
+            if screen is None:
                 return []
             
-            detections = self.opponent_detector.detect_opponent_cards(frame)
+            # Use ClashRoyaleVision to detect opponent cards
+            opponent_cards = self.vision.detect_opponent_cards(screen)
+            
+            # Convert Card objects to dict format
+            detections = []
+            for card in opponent_cards:
+                detections.append({
+                    'class_name': card.name,
+                    'confidence': 1.0,  # YOLO confidence if available
+                    'position': card.position,
+                    'cost': card.cost
+                })
+            
             return detections
         except Exception as e:
             print(f"Error detecting opponent cards: {e}")
+            import traceback
+            traceback.print_exc()
             return []
     
     def should_react_to_opponent(self, opponent_cards: List[Dict]) -> bool:
@@ -211,40 +224,39 @@ class ReactiveClashRoyaleBot:
         return None
     
     def place_card(self, card: Dict, placement_type: str = "defensive"):
-        """Place a card on the board."""
+        """Place a card on the board using correct coordinates (same as right_loop.py)."""
         try:
-            # Get card position in hand
-            card_positions = self.calib.get('card_centers', [])
-            if card['position'] >= len(card_positions):
-                print(f"Invalid card position: {card['position']}")
+            # Get card position using get_card_center_xy (same as right_loop.py)
+            card_index = card['position']
+            if card_index >= 4:
+                print(f"Invalid card position: {card_index}")
                 return False
             
+            card_xy = get_card_center_xy(self.calib, self.viewport, card_index)
+            
             # Get placement coordinates based on strategy
+            vx, vy, vw, vh = self.viewport
             if placement_type == "defensive":
-                # Place near our towers
-                vx, vy, vw, vh = self.viewport
-                placement_x = vx + vw * 0.3  # Left side of our area
-                placement_y = vy + vh * 0.7  # Lower part of our area
+                # Place near our towers (left side, lower part)
+                target_x = vx + int(0.3 * vw)
+                target_y = vy + int(0.7 * vh)
             else:
-                # Default placement
-                vx, vy, vw, vh = self.viewport
-                placement_x = vx + vw * 0.5
-                placement_y = vy + vh * 0.6
+                # Default placement (center)
+                target_x = vx + int(0.5 * vw)
+                target_y = vy + int(0.6 * vh)
             
-            # Get card center position
-            card_center = card_positions[card['position']]
-            card_x = int(self.viewport[0] + card_center['x_r'] * self.viewport[2])
-            card_y = int(self.viewport[1] + card_center['y_r'] * self.viewport[3])
+            target_xy = (target_x, target_y)
             
-            # Drag card to placement position
-            pyautogui.moveTo(card_x, card_y)
-            pyautogui.dragTo(placement_x, placement_y, duration=0.3)
+            # Use drag_card_to from strategy_utils (same as right_loop.py)
+            drag_card_to(card_xy, target_xy, duration=0.3, pre_delay=0.15)
             
-            print(f"Placed {card['name']} at ({placement_x:.0f}, {placement_y:.0f})")
+            print(f"Placed {card['name']} from {card_xy} to {target_xy}")
             return True
             
         except Exception as e:
             print(f"Error placing card: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def run_reactive_bot(self, duration: int = 300):
@@ -318,16 +330,16 @@ class ReactiveClashRoyaleBot:
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Reactive Clash Royale Bot with YOLOv8')
-    parser.add_argument('--calib', default='cv_out/calibration_manual_fixed.json')
-    parser.add_argument('--model', required=True, help='Path to trained YOLOv8 model')
+    parser = argparse.ArgumentParser(description='Reactive Clash Royale Bot with ClashRoyaleVision (Fixed Coordinates)')
+    parser.add_argument('--calib', default='cv_out/calibration_manual_fixed.json',
+                       help='Calibration file path')
     parser.add_argument('--duration', type=int, default=300, help='Duration in seconds')
     parser.add_argument('--conf', type=float, default=0.5, help='Confidence threshold')
     parser.add_argument('--cooldown', type=float, default=2.0, help='Reaction cooldown in seconds')
     parser.add_argument('--min-elixir', type=int, default=3, help='Minimum elixir for reactions')
     args = parser.parse_args()
     
-    bot = ReactiveClashRoyaleBot(args.calib, args.model)
+    bot = ReactiveClashRoyaleBot(args.calib)
     bot.confidence_threshold = args.conf
     bot.reaction_cooldown = args.cooldown
     bot.min_elixir_for_reaction = args.min_elixir

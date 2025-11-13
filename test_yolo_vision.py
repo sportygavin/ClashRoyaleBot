@@ -23,31 +23,42 @@ sys.path.append(str(Path(__file__).parent / "src"))
 from src.vision.game_vision import ClashRoyaleVision
 from core import GameState
 
-def draw_detections(image, cards, color=(0, 255, 0), label_prefix=""):
-    """Draw bounding boxes and labels for detected cards"""
+def draw_detections(image, cards, color=(0, 255, 0), label_prefix="", scale_factor=2.0):
+    """Draw bounding boxes and labels for detected cards
+    
+    Args:
+        image: Screenshot image (in screenshot coordinate space)
+        cards: List of Card objects with positions in pyautogui coordinate space
+        color: Color for drawing
+        label_prefix: Prefix for labels
+        scale_factor: Factor to convert pyautogui coords to screenshot coords (default 2.0 for Retina)
+    """
     annotated = image.copy()
     
     for card in cards:
-        pos = card.position
+        # Convert position from pyautogui space to screenshot space
+        pos_py = card.position
+        pos_screenshot = (int(pos_py[0] * scale_factor), int(pos_py[1] * scale_factor))
+        
         name = card.name
         cost = card.cost
         is_available = card.is_available
         
-        # Draw a circle at card position
-        cv2.circle(annotated, pos, 25, color, 2)
+        # Draw a circle at card position (in screenshot space)
+        cv2.circle(annotated, pos_screenshot, int(25 * scale_factor), color, int(2 * scale_factor))
         
         # Draw a thicker circle if card is unavailable
         if not is_available:
-            cv2.circle(annotated, pos, 25, (128, 128, 128), 1)
+            cv2.circle(annotated, pos_screenshot, int(25 * scale_factor), (128, 128, 128), int(1 * scale_factor))
         
         # Draw label with background
         label = f"{label_prefix}{name} ({cost})"
         if not is_available:
             label += " [X]"
         
-        # Calculate text position (above the circle)
-        text_x = pos[0]
-        text_y = pos[1] - 35
+        # Calculate text position (above the circle, in screenshot space)
+        text_x = pos_screenshot[0]
+        text_y = pos_screenshot[1] - int(35 * scale_factor)
         
         # Get text size for background
         font = cv2.FONT_HERSHEY_SIMPLEX
@@ -193,13 +204,23 @@ def test_yolo_detection(duration=60, save_images=True, output_dir="yolo_test_out
             if save_images and (len(player_cards) > 0 or len(opponent_cards) > 0):
                 annotated = screen.copy()
                 
+                # Calculate scale factor: screenshot dimensions / pyautogui dimensions
+                import pyautogui
+                screen_h, screen_w = screen.shape[:2]
+                pyautogui_w, pyautogui_h = pyautogui.size()
+                scale_factor_x = screen_w / pyautogui_w
+                scale_factor_y = screen_h / pyautogui_h
+                scale_factor = (scale_factor_x + scale_factor_y) / 2  # Average scale factor
+                
                 # Draw player cards (green)
                 if player_cards:
-                    annotated = draw_detections(annotated, player_cards, color=(0, 255, 0), label_prefix="P:")
+                    annotated = draw_detections(annotated, player_cards, color=(0, 255, 0), 
+                                               label_prefix="P:", scale_factor=scale_factor)
                 
                 # Draw opponent cards (red)
                 if opponent_cards:
-                    annotated = draw_detections(annotated, opponent_cards, color=(0, 0, 255), label_prefix="O:")
+                    annotated = draw_detections(annotated, opponent_cards, color=(0, 0, 255), 
+                                               label_prefix="O:", scale_factor=scale_factor)
                 
                 # Save image
                 timestamp = int(time.time())
